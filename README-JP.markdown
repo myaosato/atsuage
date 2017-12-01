@@ -40,7 +40,7 @@ ppp
         * 関数定義
     * HTMLの出力
 
-* ファイルの管理 file
+* ファイルの管理 files
     * 関連付け
         * 名前とテキストファイル
         * 名前とHTMLファイル
@@ -90,7 +90,7 @@ ppp
 
 ### CONVERTER - converter.lisp -
 
-### MANAGER - file.lisp -
+### FILES - files.lisp -
 
 #### set-project
 #### get-text-path
