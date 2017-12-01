@@ -64,23 +64,23 @@ ppp
 
 ## 各プロジェクトのディレクトリ構成
 
-project-dir
-|--.usuage
-|--.time-list
-|--project
-|--text
-|  |--hoge
-|  |--piyo
-|  |--...
-|--page
-|  |--hoge.html
-|  |--piyo.html
-|  |--...
-|--template
-|  |--.template-name
-|  |--template
-|  |--otherone
-|  |--...
+    project-dir
+    |--.usuage
+    |--.time-list
+    |--project
+    |--text
+    |  |--hoge
+    |  |--piyo
+    |  |--...
+    |--page
+    |  |--hoge.html
+    |  |--piyo.html
+    |  |--...
+    |--template
+    |  |--.template-name
+    |  |--template
+    |  |--otherone
+    |  |--...
 
 ## API Document
 
