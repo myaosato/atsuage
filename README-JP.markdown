@@ -26,7 +26,7 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
 * タグ付けされたテキストファイルとのやり取りtext
     * テキストファイルから中間データ形式への変換
     * 中間データ形式からテキストファイルへの変換
-
+ppp
 * 中間データ形式 data
     * データをシステム上の他の仕組みに渡す。
     * データを受け取り、新しい状態の中間データ形式を保持する。
@@ -40,7 +40,7 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
         * 関数定義
     * HTMLの出力
 
-* テキストファイルの管理 manager
+* ファイルの管理 file
     * 関連付け
         * 名前とテキストファイル
         * 名前とHTMLファイル
@@ -49,7 +49,11 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
     * 一覧の取得
     * 条件付き一覧の取得
 
-これらを組み合わせて、静的サイト生成を行おうというのがUsuageの試みです。例えば、
+これらを組み合わせて、静的サイト生成を行おうというのがUsuageの試みです。
+
+* 最終的に提供される層 core
+
+例えば、
 
 * HTMLファイルにまだ変換されていないファイルを一度にHTMLファイルに変換する。
 * あるファイルがHTMLファイルに変換された時に、別のファイルも連動して自動的に更新、変換がされる。
@@ -62,6 +66,7 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
 
 project-dir
 |--.usuage
+|--.time-list
 |--project
 |--text
 |  |--hoge
@@ -72,16 +77,33 @@ project-dir
 |  |--piyo.html
 |  |--...
 |--template
+|  |--.template-name
 |  |--template
 |  |--otherone
 |  |--...
 
 ## API Document
 
-### TEXT
+### TEXT - text.lisp -
 
-### DATA
+### DATA - data.lisp -
 
-### CONVERTER
+### CONVERTER - converter.lisp -
 
-### MANAGER 
+### MANAGER - file.lisp -
+
+#### set-project
+#### get-text-path
+#### get-html-path
+#### get-template-path
+#### get-setting-file-path
+#### get-project-file-path
+#### get-template-names-path
+#### register-time
+#### is-registered
+#### get-text-list
+
+### CORE - usuage.lisp -
+
+
+#### make-project
