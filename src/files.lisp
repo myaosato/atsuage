@@ -1,5 +1,5 @@
 (in-package :cl-user)
-(defpackage usuage.manager
+(defpackage usuage.files
   (:use :cl)
   (:import-from :cl-fad
                 :pathname-as-directory
@@ -18,7 +18,7 @@
            :register-time
            :is-registered
            :get-text-list))
-(in-package :usuage.manager)
+(in-package :usuage.files)
 
 (defvar *project-dir*)
 (defvar *text-dir*)
@@ -71,7 +71,7 @@
   (= (get-time name)
      (get-registered-time name)))
 
-(defun register-time ()
+(defun register-time (name)
   (setf (gethash name *time-list-table*) (get-time name))
   (with-open-file (out (get-time-list-teble-path) 
                        :direction :output :if-exists :supersede)

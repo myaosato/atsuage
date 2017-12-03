@@ -26,7 +26,7 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
 * タグ付けされたテキストファイルとのやり取りtext
     * テキストファイルから中間データ形式への変換
     * 中間データ形式からテキストファイルへの変換
-ppp
+
 * 中間データ形式 data
     * データをシステム上の他の仕組みに渡す。
     * データを受け取り、新しい状態の中間データ形式を保持する。
@@ -86,22 +86,37 @@ ppp
 
 ### TEXT - text.lisp -
 
+* get-data-from-text (pathname &optional (upcase t))
+* set-data-to-text (pathname data)
+
 ### DATA - data.lisp -
+
+* get-value (&optional name)
+* get-value-as-seq (prop name)
+* set-value (prop name obj)
+* add-value (prop name str)
+* load-setting-file
+* get-setting-value (prop)
+* load-template-names-file 
+* read-template (text-name)
 
 ### CONVERTER - converter.lisp -
 
+* convert
+* write-html
+
 ### FILES - files.lisp -
 
-#### set-project
-#### get-text-path
-#### get-html-path
-#### get-template-path
-#### get-setting-file-path
-#### get-project-file-path
-#### get-template-names-path
-#### register-time
-#### is-registered
-#### get-text-list
+* set-project (dir)
+* get-text-path (name)
+* get-html-path (name)
+* get-template-path (name)
+* get-setting-file-path 
+* get-project-file-path 
+* get-template-names-path ()
+* register-time (name)
+* is-registered (name)
+* get-text-list 
 
 ### CORE - usuage.lisp -
 
