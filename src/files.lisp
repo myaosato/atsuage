@@ -47,7 +47,7 @@
 (defun get-setting-file-path () 
   (merge-pathnames #p".usuage" *project-dir*))
 
-(defun get-project-file-path () 
+(defun get-project-file-path ()
   (merge-pathnames #p"project" *project-dir*))
 
 (defun get-template-names-path () 

@@ -95,15 +95,14 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
 * get-value-as-seq (prop name)
 * set-value (prop name obj)
 * add-value (prop name str)
-* load-setting-file
+* load-setting-file ()
 * get-setting-value (prop)
-* load-template-names-file 
+* load-template-names-file ()
 * read-template (text-name)
 
 ### CONVERTER - converter.lisp -
 
 * convert
-* write-html
 
 ### FILES - files.lisp -
 
@@ -111,14 +110,13 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
 * get-text-path (name)
 * get-html-path (name)
 * get-template-path (name)
-* get-setting-file-path 
-* get-project-file-path 
+* get-setting-file-path ()
+* get-project-file-path ()
 * get-template-names-path ()
 * register-time (name)
 * is-registered (name)
-* get-text-list 
+* get-text-list ()
 
 ### CORE - usuage.lisp -
 
-
-#### make-project
+* make-project (name dir)

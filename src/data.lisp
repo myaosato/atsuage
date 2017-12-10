@@ -16,7 +16,9 @@
            :get-value-as-seq
            :set-value
            :add-value
-           :save-data))
+           :save-data
+           :load-template-names-file
+           :read-template))
 
 (in-package :usuage.data)
 

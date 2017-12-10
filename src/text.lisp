@@ -16,4 +16,4 @@
 
 (defun set-data-to-text (pathname data)
   (with-open-file (out pathname :direction :output :if-exists :supersede)
-    (prin1 (indite data) out)))
+    (princ (indite data) out)))
