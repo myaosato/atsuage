@@ -2,14 +2,18 @@
   (:use :cl)
   (:import-from :cl-fad
                 :pathname-as-directory)
+  (:import-from :rosa
+                :indite)
   (:import-from :usuage.files
-                :set-project
+                :set-project-dirs
                 :get-text-path
-                :get-html-path
+                :get-page-path
                 :get-template-path
                 :get-setting-file-path
                 :get-project-file-path
-                :get-template-names-path))
+                :get-template-names-path
+                :get-time-list-teble-path)
+  (:export :make-project))
 (in-package :usuage)
 
 (defun pwd ()
@@ -20,15 +24,18 @@
 
 (defun make-file (path str)
   (handler-bind ((error (lambda (c) (declare (ignore c)) (return-from make-file nil))))
-    (with-open-file (out path :direction :output :if-exists :error)
+    (with-open-file (out path :direction :output
+                         :if-exists :error
+                         :if-does-not-exist :create)
       (princ str out)
       t)))
 
 (defun make-project (name &optional (dir (pwd)))
   (let* ((project-dir (merge-pathnames (pathname-as-directory name) dir)))
-    (set-project project-dir)
+    (set-project-dirs project-dir)
+    (mkdir project-dir)
     (mkdir (get-text-path ""))
-    (mkdir (get-html-path ""))
+    (mkdir (get-page-path ""))
     (mkdir (get-template-path ""))
     (make-file (get-project-file-path) (indite '(:title "" :author "" :since "")))
     (make-file (get-template-names-path) "")

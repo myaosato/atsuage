@@ -68,15 +68,15 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
     |--.usuage
     |--.time-list
     |--project
-    |--text
+    |--texts
     |  |--hoge
     |  |--piyo
     |  |--...
-    |--page
+    |--pages
     |  |--hoge.html
     |  |--piyo.html
     |  |--...
-    |--template
+    |--templates
     |  |--.template-name
     |  |--template
     |  |--otherone
@@ -106,13 +106,15 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
 
 ### FILES - files.lisp -
 
-* set-project (dir)
+* set-project-dirs (dir)
+* set-time-list-table (dir)
 * get-text-path (name)
-* get-html-path (name)
+* get-page-path (name)
 * get-template-path (name)
 * get-setting-file-path ()
 * get-project-file-path ()
 * get-template-names-path ()
+* get-time-list-teble-path ()
 * register-time (name)
 * is-registered (name)
 * get-text-list ()

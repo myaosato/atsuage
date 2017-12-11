@@ -2,7 +2,7 @@
 (defpackage usuage.data
   (:use :cl)
   (:import-from :cl-ppcre
-                :)
+                :scan)
   (:import-from :usuage.files
                 :get-text-path
                 :get-setting-file-path
@@ -23,7 +23,7 @@
 (in-package :usuage.data)
 
 (defun get-key (name)
-  (read-from-string (format nil ":~A" (string-upcase prop))))
+  (read-from-string (format nil ":~A" (string-upcase name))))
 
 ;;; SETTING
 (defvar *settitng-data*)
@@ -46,7 +46,7 @@
       ((or template-name
            (>= ind (length *template-name-data*)))
        template-name)
-    (if (scan (concatenate 'stirng (elt *template-name-data* ind) "$") text-name)
+    (if (scan (concatenate 'string (elt *template-name-data* ind) "$") text-name)
         (setf template-name (elt *template-name-data* (1- ind))))))
 
 (defun read-template (name)
@@ -95,23 +95,24 @@
   (getf (get-data name) (get-key prop)))
 
 (defun get-value (prop name &optional (ind 0))
-  (let (seq (get-prop-as-seq prop name)))
+  (let ((seq (get-value-as-seq prop name)))
     (if (and seq (> (length seq) ind))
-        (elt seq ind)))
+        (elt seq ind))))
 
 (defun set-value (prop name obj)
   (cond ((or (stringp obj) (seq-p obj))
-         (setf (getf (get-data name) (get-key prop))
-               (coerce (if (stringp obj) (list obj) obj) 'vect)))
+         (let ((data (get-data name)))
+           (setf (getf data (get-key prop))
+                 (coerce (if (stringp obj) (list obj) obj) 'vector))))
         (t nil))
   (save-data name))
   
 (defun add-value (prop name str)
-  (if (not (stringp str) (return-from add-prop nil)))
-  (let ((seq (get-prop-as-seq prop name)))
+  (if (not (stringp str)) (return-from add-value nil))
+  (let ((seq (get-value-as-seq prop name)))
     (if seq
-        (set-prop prop name (append (coerce seq 'list) (list str)))
-        (set-prop porp name str)))
+        (set-value prop name (append (coerce seq 'list) (list str)))
+        (set-value prop name str)))
   (save-data name))
 
 

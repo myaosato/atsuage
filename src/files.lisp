@@ -4,20 +4,22 @@
   (:import-from :cl-fad
                 :pathname-as-directory
                 :list-directory)
-  (:import-from :alxandria
+  (:import-from :alexandria
                 :hash-table-plist
                 :plist-hash-table)
   (:import-from :local-time)
-  (:export :set-project
+  (:export :set-time-list-table
            :get-text-path
-           :get-html-path
+           :get-page-path
            :get-template-path
            :get-setting-file-path
            :get-project-file-path
            :get-template-names-path
            :register-time
            :is-registered
-           :get-text-list))
+           :get-text-list
+           :get-time-list-teble-path
+           :set-project-dirs))
 (in-package :usuage.files)
 
 (defvar *project-dir*)
@@ -27,19 +29,22 @@
 (defvar *time-list-table*)
 
 ;;; SETTING
-(defun set-project (dir)
+(defun set-project-dirs (dir)
   (setf *project-dir* (pathname-as-directory dir))
-  (setf *text-dir* (merge-pathnames "text/" *project-dir*))
-  (setf *page-dir* (merge-pathnames "page/" *project-dir*))
-  (setf *template-dir* (merge-pathnames "template/" *project-dir*))
+  (setf *text-dir* (merge-pathnames "texts/" *project-dir*))
+  (setf *page-dir* (merge-pathnames "pages/" *project-dir*))
+  (setf *template-dir* (merge-pathnames "templates/" *project-dir*)))
+
+(defun set-project (dir)
+  (if (null *project-dir*) (set-project-dirs dir))
   (setf *time-list-table* (get-time-list-table)))
 
 ;;; PATH
 (defun get-text-path (name)
   (merge-pathnames name *text-dir*))
 
-(defun get-html-path (name)
-  (merge-pathnames (format nil "~A.html" name) *html-dir*))
+(defun get-page-path (name)
+  (merge-pathnames (format nil "~A.html" name) *page-dir*))
 
 (defun get-template-path (name) 
   (merge-pathnames name *template-dir*))
@@ -59,7 +64,7 @@
 ;;; TIME
 (defun get-time-list-table ()
   (with-open-file (in (get-time-list-teble-path))
-    (plist-hash-table (read in) :test 'equal))
+    (plist-hash-table (read in) :test 'equal)))
 
 (defun get-registered-time (name)
   (gethash name *time-list-table*))

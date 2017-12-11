@@ -1,7 +1,7 @@
 (in-package :cl-user)
-(defpackage usuage.lisp
+(defpackage usuage.converter
   (:use :cl))
-(in-package :usuage)
+(in-package :usuage.converter)
 
 (eval-when (:load-toplevel :compile-toplevel)
   (defvar *no-end-tags* (make-hash-table))
