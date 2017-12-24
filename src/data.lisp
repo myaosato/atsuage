@@ -4,11 +4,7 @@
   (:import-from :cl-ppcre
                 :scan)
   (:import-from :usuage.files
-                :get-text-path
-                :get-setting-file-path
-                :get-project-file-path
-                :get-template-path
-                :get-template-names-path)
+                :get-texts-path)
   (:import-from :usuage.text
                 :get-data-from-text
                 :set-data-to-text)
@@ -16,49 +12,25 @@
            :get-value-as-seq
            :set-value
            :add-value
+           :make-data
            :save-data
-           :load-template-names-file
-           :read-template))
-
+           :set-current-name
+           :get-current-name))
 (in-package :usuage.data)
 
 (defun get-key (name)
   (read-from-string (format nil ":~A" (string-upcase name))))
 
-;;; SETTING
-(defvar *settitng-data*)
-
-(defun load-setting-file ()
-  (setf *settitng-data* (get-data-from-text (get-setting-file-path))))
-
-(defun get-setting-value (prop)
-  (elt (getf *settitng-data* (get-key prop)) 0)) 
-
-;;; TEMPLATE
-(defvar *template-name-data*)
-
-(defun load-template-names-file ()
-  (setf *template-name-data* (get-data-from-text (get-template-names-path) nil)))
-
-(defun get-template-name (text-name)
-  (do ((template-name nil)
-       (ind 1 (+ ind 2)))
-      ((or template-name
-           (>= ind (length *template-name-data*)))
-       template-name)
-    (if (scan (concatenate 'string (elt *template-name-data* ind) "$") text-name)
-        (setf template-name (elt *template-name-data* (1- ind))))))
-
-(defun read-template (name)
-  (with-open-file (in (get-template-path (get-template-name name)))
-    (read in)))
-
-;;; KEY-VALUE
+;;; CURRENT
 (defvar *current-name*)
 
 (defun set-current-name (name)
   (setf *current-name* name))
 
+(defun get-current-name ()
+  *current-name*)
+
+;;; MANAGE DATA
 (defvar *data-table* '(make-hash-table :test #'equal))       
 
 (defun push-data (name data)
@@ -74,48 +46,41 @@
   (let ((data (exists-data name)))
     (if data
         data
-        (push-data name
-                   (cond ((String= name "project")
-                          (get-data-from-text (get-project-file-path)))
-                         ((or (null name) (String= name ""))
-                          (get-data-from-text (get-text-path *current-name*)))
-                         (t (get-data-from-text (get-text-path name))))))))
+        (push-data name (get-data-from-text name)))))
 
-(defun save-data (name)
-  (let ((data (exists-data name)))
-    (if data
-        (%save-data name data))))
+;;; NEW DATA
+(defun make-data (name)
+  (push-data name nil))
 
-(defun %save-data (name data)
-  (cond ((String= name "project")
-         (set-data-to-text (get-project-file-path) data))
-        (t (set-data-to-text (get-text-path name) data))))
-
-(defun get-value-as-seq (prop name)
+;;; GET VALUE
+(defun get-value-as-seq (prop &optional (name *current-name*))
   (getf (get-data name) (get-key prop)))
 
-(defun get-value (prop name &optional (ind 0))
+(defun get-value (prop &optional (name *current-name*) (ind 0))
   (let ((seq (get-value-as-seq prop name)))
     (if (and seq (> (length seq) ind))
         (elt seq ind))))
 
-(defun set-value (prop name obj)
-  (cond ((or (stringp obj) (seq-p obj))
-         (let ((data (get-data name)))
-           (setf (getf data (get-key prop))
-                 (coerce (if (stringp obj) (list obj) obj) 'vector))))
-        (t nil))
-  (save-data name))
+;; SET AND SAVE
+(defun set-value (prop name obj &optional (save? nil))
+  (flet ((make-value (obj)
+           (if (seq-p obj)
+               (coerce obj 'vector)
+               (coerce (list (string obj)) 'vector))))
+    (let ((data (get-data name))
+          (value (make-value obj)))
+      (setf (gethash prop data) obj)
+      (if save? (save-data name)))))
   
-(defun add-value (prop name str)
-  (if (not (stringp str)) (return-from add-value nil))
-  (let ((seq (get-value-as-seq prop name)))
+(defun add-value (prop name str &optional (save? nil))
+  (let ((value (string str))
+        (seq (get-value-as-seq prop name)))
     (if seq
-        (set-value prop name (append (coerce seq 'list) (list str)))
-        (set-value prop name str)))
-  (save-data name))
+        (set-value prop name (append (coerce seq 'list) (list str)) save?)
+        (set-value prop name str save?))))
 
-
-
-
-
+  
+(defun save-data (name)
+  (let ((data (exists-data name)))
+    (if data
+        (set-data-to-text (get-text-path name) data))))

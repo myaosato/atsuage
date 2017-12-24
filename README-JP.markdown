@@ -12,6 +12,8 @@ myaosato、つまり私は、仕様を変更する際には、ここに明記す
 
 ## Usuageでやりたいこと
 
+    SIMPLE STRUCTURED TEXT FILE + HTML LIKE TEMPLATE FILE = HTML FILE
+
 Usuageは、以下のデータを管理したり、必要に応じて変換します。変換は、概ね上から下に向かって行われます。
 
 1. タグ付けされたテキストファイル
@@ -19,56 +21,13 @@ Usuageは、以下のデータを管理したり、必要に応じて変換し�
 3. テンプレート
 4. HTMLファイル
 
-中間データ形式のみ永続化されず、システムが起動中にのみメモリ上に存在します。その他のものは、永続化されファイルシステム上に存在するファイルです。
-
-Usuageは、いくつかの部分に分けて考えることが出来ます。
-
-* タグ付けされたテキストファイルとのやり取りtext
-    * テキストファイルから中間データ形式への変換
-    * 中間データ形式からテキストファイルへの変換
-
-* 中間データ形式 data
-    * データをシステム上の他の仕組みに渡す。
-    * データを受け取り、新しい状態の中間データ形式を保持する。
-    
-* テンプレートエンジンconverter
-    * テンプレートの解釈
-        * テンプレートエンジン用の関数
-            * データの埋め込み
-            * 条件分岐
-            * 繰り返し処理
-        * 関数定義
-    * HTMLの出力
-
-* ファイルの管理 files
-    * 関連付け
-        * 名前とテキストファイル
-        * 名前とHTMLファイル
-    * HTMLファイルに変換した日時の記録
-    * ファイルの更新日の取得
-    * 一覧の取得
-    * 条件付き一覧の取得
-
-これらを組み合わせて、静的サイト生成を行おうというのがUsuageの試みです。
-
-* 最終的に提供される層 core
-
-例えば、
-
-* HTMLファイルにまだ変換されていないファイルを一度にHTMLファイルに変換する。
-* あるファイルがHTMLファイルに変換された時に、別のファイルも連動して自動的に更新、変換がされる。
-
-組み合わせ方をどのように提供しておけばよいのかについて、今はまだ良いアイデアはありません。
-
-## 用語
-
 ## 各プロジェクトのディレクトリ構成
 
     project-dir
     |--.usuage
-    |--.time-list
-    |--project
     |--texts
+    |  |--template-name
+    |  |--project
     |  |--hoge
     |  |--piyo
     |  |--...
@@ -77,48 +36,51 @@ Usuageは、いくつかの部分に分けて考えることが出来ます。
     |  |--piyo.html
     |  |--...
     |--templates
-    |  |--.template-name
     |  |--template
     |  |--otherone
     |  |--...
 
-## API Document
-
-### TEXT - text.lisp -
-
-* get-data-from-text (pathname &optional (upcase t))
-* set-data-to-text (pathname data)
-
-### DATA - data.lisp -
-
-* get-value (&optional name)
-* get-value-as-seq (prop name)
-* set-value (prop name obj)
-* add-value (prop name str)
-* load-setting-file ()
-* get-setting-value (prop)
-* load-template-names-file ()
-* read-template (text-name)
-
-### CONVERTER - converter.lisp -
-
-* convert
-
-### FILES - files.lisp -
-
-* set-project-dirs (dir)
-* set-time-list-table (dir)
-* get-text-path (name)
-* get-page-path (name)
-* get-template-path (name)
-* get-setting-file-path ()
-* get-project-file-path ()
-* get-template-names-path ()
-* get-time-list-teble-path ()
-* register-time (name)
-* is-registered (name)
-* get-text-list ()
+## API Document? 
 
 ### CORE - usuage.lisp -
 
 * make-project (name dir)
+* make-page (name)
+* update ()
+* update-all ()
+* make-text (name &optional ...)
+
+init
+find-project
+
+## API MEMO
+
+### FILES - files.lisp -
+
+* set-project-dirs (dir)
+* get-text-path (name)
+* get-page-path (name)
+* get-template-path (name)
+* get-text-list
+* get-template-list
+
+### TEXT - text.lisp - 
+
+* get-data-from-text (pathname &optional (upcase t))
+* set-data-to-text (pathname data)
+
+### DATA - data.lisp - 
+
+* get-value (prop name &optional (ind 0))
+* get-value-as-seq (prop name)
+* set-value (prop name obj)
+* add-value (prop name str)
+* make-data (name)
+* save-data (name)
+* set-curret-name (name)
+* get-curret-name ()
+
+### CONVERTER - converter.lisp -
+
+* convert [name template-sexp]
+

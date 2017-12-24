@@ -7,82 +7,38 @@
   (:import-from :alexandria
                 :hash-table-plist
                 :plist-hash-table)
-  (:import-from :local-time)
-  (:export :set-time-list-table
+  (:export :set-project-dirs
            :get-text-path
            :get-page-path
            :get-template-path
-           :get-setting-file-path
-           :get-project-file-path
-           :get-template-names-path
-           :register-time
-           :is-registered
            :get-text-list
-           :get-time-list-teble-path
-           :set-project-dirs))
+           :get-template-list))
 (in-package :usuage.files)
 
 (defvar *project-dir*)
 (defvar *text-dir*)
 (defvar *page-dir*)
-(defvar *template-dir*)
-(defvar *time-list-table*)
+(defvar *templates-dir*)
+
 
 ;;; SETTING
 (defun set-project-dirs (dir)
   (setf *project-dir* (pathname-as-directory dir))
-  (setf *text-dir* (merge-pathnames "texts/" *project-dir*))
-  (setf *page-dir* (merge-pathnames "pages/" *project-dir*))
+  (setf *texts-dir* (merge-pathnames "texts/" *project-dir*))
+  (setf *pages-dir* (merge-pathnames "pages/" *project-dir*))
   (setf *template-dir* (merge-pathnames "templates/" *project-dir*)))
-
-(defun set-project (dir)
-  (if (null *project-dir*) (set-project-dirs dir))
-  (setf *time-list-table* (get-time-list-table)))
 
 ;;; PATH
 (defun get-text-path (name)
-  (merge-pathnames name *text-dir*))
+  (merge-pathnames name *texts-dir*))
 
 (defun get-page-path (name)
-  (merge-pathnames (format nil "~A.html" name) *page-dir*))
+  (merge-pathnames (format nil "~A.html" name) *pages-dir*))
 
 (defun get-template-path (name) 
-  (merge-pathnames name *template-dir*))
+  (merge-pathnames name *templates-dir*))
 
-(defun get-setting-file-path () 
-  (merge-pathnames #p".usuage" *project-dir*))
-
-(defun get-project-file-path ()
-  (merge-pathnames #p"project" *project-dir*))
-
-(defun get-template-names-path () 
-  (merge-pathnames #p".template-name" *template-dir*))
-
-(defun get-time-list-teble-path ()
-  (merge-pathnames #p".time-list" *project-dir*))
-
-;;; TIME
-(defun get-time-list-table ()
-  (with-open-file (in (get-time-list-teble-path))
-    (plist-hash-table (read in) :test 'equal)))
-
-(defun get-registered-time (name)
-  (gethash name *time-list-table*))
-
-(defun get-time (name)
-  (file-write-date (get-text-path name)))
-
-(defun is-registered (name)
-  (= (get-time name)
-     (get-registered-time name)))
-
-(defun register-time (name)
-  (setf (gethash name *time-list-table*) (get-time name))
-  (with-open-file (out (get-time-list-teble-path) 
-                       :direction :output :if-exists :supersede)
-    (prin1 (hash-table-plist *time-list-table*))))
-
-;;; FILE-LIST  
+;;; FILE-LIST-UTIL  
 (defun dir-p (pathname)
   (and (not (pathname-name pathname))))
 
@@ -104,5 +60,9 @@
                           (concatenate 'string (dir-name pn) elt))
                         (deep-ls pn)))))
 
+;;; FILE-LIST
 (defun get-text-list ()
   (files *text-dir*))
+
+(defun get-template-list ()
+  (files *template-dir*))
