@@ -5,11 +5,18 @@
                 :markdown)
   (:import-from :usuage.data
                 :get-value
-                :get-value-as-seq
-                :set-current-name
-                :get-current-name)
+                :get-value-as-seq)
   (:export :convert))
 (in-package :usuage.converter)
+
+;;; CURRENT
+(defvar *current-name*)
+
+(defun set-current-name (name)
+  (setf *current-name* name))
+
+(defun get-current-name ()
+  *current-name*)
 
 ;; ****
 

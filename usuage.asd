@@ -13,7 +13,7 @@
                  (:file "files")
                  (:file "converter" :depends-on ("data"))
                  (:file "data" :depends-on ("files" "text"))
-                 (:file "usuage" :depends-on ("files" "text" "converter")))))
+                 (:file "core" :depends-on ("files" "data" "converter")))))
   :description "Usuage is simple static site generator"
   :long-description
   #.(read-file-string

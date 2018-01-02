@@ -1,4 +1,4 @@
-(defpackage usuage
+(defpackage usuage.core
   (:use :cl)
   (:import-from :cl-fad
                 :pathname-as-directory)
@@ -6,31 +6,26 @@
                 :indite)
   (:import-from :usuage.files
                 :set-project-dirs
+                :get-text-list
+                :get-template-list
                 :get-text-path
                 :get-page-path
-                :get-template-path
-                :get-setting-file-path
-                :get-project-file-path
-                :get-template-names-path
-                :get-time-list-teble-path
-                :register-time
-                :is-registered
-                :get-text-list)
+                :get-template-path)
   (:import-from :usuage.data
-                :read-template
-                :load-template-names-file
-                :load-setting-file)
-  (:import-from :usuage.text
-                :set-data-to-text)
+                :get-value-as-seq
+                :set-value
+                :add-value
+                :make-data
+                :save-data)
   (:import-from :usuage.converter
                 :convert)
   (:export :make-project
            :make-text
-           :make-page
-           :update
-           :update-all))
-(in-package :usuage)
+           :make-page))
 
+(in-package :usuage.core)
+
+;;; UTIL
 (defun pwd ()
   (truename "."))
 
@@ -45,63 +40,45 @@
       (princ str out)
       t)))
 
-;; 
+(defun write-file (path str)
+    (handler-bind ((error (lambda (c) (declare (ignore c)) (return-from write-file nil))))
+      (with-open-file (out path :direction :output :if-exists :supersede)
+        (princ str out)
+        t)))
+
+;;; MAKE-PROJECT
 (defun make-project (name &optional (dir (pwd)))
-  (let* ((project-dir (merge-pathnames (pathname-as-directory name) dir)))
+  (let* ((project-dir (merge-pathnames (pathname-as-directory name) (pathname-as-directory dir))))
     (set-project-dirs project-dir)
     (mkdir project-dir)
     (mkdir (get-text-path ""))
     (mkdir (get-page-path ""))
-    (mkdir (get-template-path ""))
-    (make-file (get-project-file-path) (indite '(:title #("") :author #("") :since #(""))))
-    (make-file (get-template-names-path) "")
-    (make-file (get-time-list-teble-path) "")
-    (make-file (get-setting-file-path) "")))
+    (mkdir (get-template-path ""))))
 
-;;
-(defun find-project () nil) ;; TODO
-
-(defun init () nil) ;; TODO
+;;; INIT
+(defun initialize (dir)
+  (prepare-project dir))
 
 (defun prepare-project (dir)
-  (set-project-dirs dir)
-  (set-time-list-table dir)
-  (load-setting-file)
-  (load-template-names-file))
+  (set-project-dirs dir))
 
-;;
-(defun make-text (name &optional (title "") (date "")
-                         (prev "") (next "") (up "") (id "") (text ""))
-  (set-data-to-text (get-text-path name)
-                    (loop for remain
-                       on (list :title title :date date
-                                :prev prev :next next :up up :id id :text text)
-                       by #'cddr
-                       append (list (car remain)
-                                    (make-array 1 :initial-element (cadr remain))))))
+;;; MAKE-FILES
+(defun read-template (template-name)
+  (with-open-file (in (get-template-path template-name))
+    (read in)))
 
-(defun make-page (name)
-  (let ((template-sexp (read-template name)))
-    (with-open-file (out (get-page-path name)
-                         :direction :output
-                         :if-exists :supersede)
-      (princ (convert name template-sexp) out))
-    (register-time name)))
+(defun make-text (name &rest key-strs)
+  (make-data name)
+  (do* ((remain key-strs (cddr remain))
+        (key (car remain) (car remain))
+        (obj (cadr remain) (cadr remain)))
+       ((null remain) nil)
+    (set-value key name obj))
+  (save-data name))
 
-(defun update-if-not (predicate)
-  (loop for name in (remove-if predicate (get-text-list))
-       do (make-page name)))
-
-(defun update ()
-  (update-if-not #'is-registerd))
-
-(defun update-all ()
-  (update-if-not (lambda (elt) (declare (ignore elt)) nil)))
-
-
-
-
-  
-
-
-
+(defun make-page (name &optional (template-name "template") (pre nil) (post nil))
+  (if (functionp pre)
+      (apply pre name template-name))
+  (write-file (get-page-path name) (convert name (read-template template-name)))
+  (if (functionp post)
+      (apply post name template-name)))

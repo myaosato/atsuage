@@ -2,5 +2,5 @@
 
 Usuage is simple? static site generator?.
 
-In development.
+Work In Progress
 

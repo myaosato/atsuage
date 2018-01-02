@@ -26,7 +26,7 @@
   (setf *project-dir* (pathname-as-directory dir))
   (setf *texts-dir* (merge-pathnames "texts/" *project-dir*))
   (setf *pages-dir* (merge-pathnames "pages/" *project-dir*))
-  (setf *template-dir* (merge-pathnames "templates/" *project-dir*)))
+  (setf *templates-dir* (merge-pathnames "templates/" *project-dir*)))
 
 ;;; PATH
 (defun get-text-path (name)

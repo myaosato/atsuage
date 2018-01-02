@@ -26,7 +26,6 @@ Usuageは、以下のデータを管理したり、必要に応じて変換し�
     project-dir
     |--.usuage
     |--texts
-    |  |--template-name
     |  |--project
     |  |--hoge
     |  |--piyo
@@ -40,18 +39,7 @@ Usuageは、以下のデータを管理したり、必要に応じて変換し�
     |  |--otherone
     |  |--...
 
-## API Document? 
-
-### CORE - usuage.lisp -
-
-* make-project (name dir)
-* make-page (name)
-* update ()
-* update-all ()
-* make-text (name &optional ...)
-
-init
-find-project
+## API Document?
 
 ## API MEMO
 
@@ -73,8 +61,8 @@ find-project
 
 * get-value (prop name &optional (ind 0))
 * get-value-as-seq (prop name)
-* set-value (prop name obj)
-* add-value (prop name str)
+* set-value (prop name obj &optional (save? nil))
+* add-value (prop name str &optional (save? nil))
 * make-data (name)
 * save-data (name)
 * set-curret-name (name)
@@ -83,4 +71,11 @@ find-project
 ### CONVERTER - converter.lisp -
 
 * convert [name template-sexp]
+
+### CORE - core.lisp -
+
+* initialize (dir)
+* make-project (name dir)
+* make-text (name &rest key-strs)
+* make-page (name &optional (template-name "template"))
 

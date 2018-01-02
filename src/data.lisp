@@ -4,7 +4,7 @@
   (:import-from :cl-ppcre
                 :scan)
   (:import-from :usuage.files
-                :get-texts-path)
+                :get-text-path)
   (:import-from :usuage.text
                 :get-data-from-text
                 :set-data-to-text)
@@ -13,40 +13,27 @@
            :set-value
            :add-value
            :make-data
-           :save-data
-           :set-current-name
-           :get-current-name))
+           :save-data))
 (in-package :usuage.data)
 
 (defun get-key (name)
   (read-from-string (format nil ":~A" (string-upcase name))))
 
-;;; CURRENT
-(defvar *current-name*)
-
-(defun set-current-name (name)
-  (setf *current-name* name))
-
-(defun get-current-name ()
-  *current-name*)
-
 ;;; MANAGE DATA
 (defvar *data-table* '(make-hash-table :test #'equal))       
+
+(defun load-data (name)
+  (unless (data-exists name)
+    (push-data name (get-data-from-text (get-text-path name)))))
 
 (defun push-data (name data)
   (setf (gethash name *data-table*) data))
 
-(defun exists-data (name)
-  (gethash name *data-table*))
+(defun data-exists (name)
+  (not (second (multiple-value-list (gethash name *data-table*)))))
 
-(defmacro seq-p (obj)
-  `(typep ,obj 'sequence))
-
-(defun get-data (&optional name)
-  (let ((data (exists-data name)))
-    (if data
-        data
-        (push-data name (get-data-from-text name)))))
+(defmacro get-data (name)
+  `(gethash ,name *data-table*))
 
 ;;; NEW DATA
 (defun make-data (name)
@@ -54,6 +41,7 @@
 
 ;;; GET VALUE
 (defun get-value-as-seq (prop &optional (name *current-name*))
+  (load-data name)
   (getf (get-data name) (get-key prop)))
 
 (defun get-value (prop &optional (name *current-name*) (ind 0))
@@ -63,21 +51,21 @@
 
 ;; SET AND SAVE
 (defun set-value (prop name obj &optional (save? nil))
-  (flet ((make-value (obj)
-           (if (seq-p obj)
-               (coerce obj 'vector)
-               (coerce (list (string obj)) 'vector))))
-    (let ((data (get-data name))
-          (value (make-value obj)))
-      (setf (gethash prop data) obj)
-      (if save? (save-data name)))))
+  (if (data-exists name)
+      (flet ((make-value (obj)
+               (if (typep obj 'sequence)
+                   (coerce obj 'vector)
+                   (coerce (list (string obj)) 'vector))))
+        (let ((value (make-value obj)))
+          (setf (getf (gethash name *data-table*) prop) value)
+          (if save? (save-data name))))))
   
 (defun add-value (prop name str &optional (save? nil))
   (let ((value (string str))
         (seq (get-value-as-seq prop name)))
     (if seq
-        (set-value prop name (append (coerce seq 'list) (list str)) save?)
-        (set-value prop name str save?))))
+        (set-value prop name (append (coerce seq 'list) (list value)) save?)
+        (set-value prop name value save?))))
 
   
 (defun save-data (name)
