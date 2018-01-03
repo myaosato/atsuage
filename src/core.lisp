@@ -19,7 +19,8 @@
                 :save-data)
   (:import-from :usuage.converter
                 :convert)
-  (:export :make-project
+  (:export :initialize
+           :make-project
            :make-text
            :make-page))
 
@@ -69,9 +70,9 @@
 
 (defun make-text (name &rest key-strs)
   (make-data name)
-  (do* ((remain key-strs (cddr remain))
-        (key (car remain) (car remain))
-        (obj (cadr remain) (cadr remain)))
+  (do* ((remain (reverse key-strs) (cddr remain))
+        (obj (car remain) (car remain))
+        (key (cadr remain) (cadr remain)))
        ((null remain) nil)
     (set-value key name obj))
   (save-data name))

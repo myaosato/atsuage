@@ -20,7 +20,7 @@
   (read-from-string (format nil ":~A" (string-upcase name))))
 
 ;;; MANAGE DATA
-(defvar *data-table* '(make-hash-table :test #'equal))       
+(defvar *data-table* (make-hash-table :test #'equal))       
 
 (defun load-data (name)
   (unless (data-exists name)
@@ -30,7 +30,7 @@
   (setf (gethash name *data-table*) data))
 
 (defun data-exists (name)
-  (not (second (multiple-value-list (gethash name *data-table*)))))
+  (second (multiple-value-list (gethash name *data-table*))))
 
 (defmacro get-data (name)
   `(gethash ,name *data-table*))
@@ -53,7 +53,7 @@
 (defun set-value (prop name obj &optional (save? nil))
   (if (data-exists name)
       (flet ((make-value (obj)
-               (if (typep obj 'sequence)
+               (if (and (typep obj 'sequence) (not (stringp obj)))
                    (coerce obj 'vector)
                    (coerce (list (string obj)) 'vector))))
         (let ((value (make-value obj)))
@@ -69,6 +69,5 @@
 
   
 (defun save-data (name)
-  (let ((data (exists-data name)))
-    (if data
-        (set-data-to-text (get-text-path name) data))))
+  (if (data-exists name)
+      (set-data-to-text (get-text-path name) (get-data name))))

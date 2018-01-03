@@ -49,7 +49,7 @@
 
 ;; ****
 (defun convert-list-to-attribute-format (&rest attr-list)
-  (convert-list-to-attribute-format attr-list))
+  (%convert-list-to-attribute-format attr-list))
   
 (defun %convert-list-to-attribute-format (attr-list &optional (str ""))
   (cond ((null attr-list) str)
