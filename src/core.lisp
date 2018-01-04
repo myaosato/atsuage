@@ -18,7 +18,8 @@
                 :make-data
                 :save-data)
   (:import-from :usuage.converter
-                :convert)
+                :convert
+                :read-template-form-file)
   (:export :initialize
            :make-project
            :make-text
@@ -65,8 +66,7 @@
 
 ;;; MAKE-FILES
 (defun read-template (template-name)
-  (with-open-file (in (get-template-path template-name))
-    (read in)))
+  (read-template-form-file (get-template-path template-name)))
 
 (defun make-text (name &rest key-strs)
   (make-data name)

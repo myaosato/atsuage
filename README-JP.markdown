@@ -70,7 +70,8 @@ Usuageは、以下のデータを管理したり、必要に応じて変換し�
 
 ### CONVERTER - converter.lisp -
 
-* convert [name template-sexp]
+* convert (name template-sexp)
+* read-template-form-file (template-path)
 
 ### CORE - core.lisp -
 

@@ -6,7 +6,8 @@
   (:import-from :usuage.data
                 :get-value
                 :get-value-as-seq)
-  (:export :convert))
+  (:export :convert
+           :read-template-form-file))
 (in-package :usuage.converter)
 
 ;;; CURRENT
@@ -38,7 +39,7 @@
   (cond ((null attr-list) str)
         ((symbolp (car attr-list))
          (cond ((stringp (cadr attr-list))
-                (%convert-list-to-attribute-format 
+                (convert-list-to-attribute-format 
                  (cddr attr-list)
                  (format nil 
                          "~A ~A=\"~A\"" 
@@ -46,7 +47,7 @@
                          (string-downcase (string (car attr-list)))
                          (cadr attr-list))))
                (t
-                (%convert-list-to-attribute-format 
+                (convert-list-to-attribute-format 
                  (cddr attr-list)
                  (format nil 
                          "~A ~A" 
@@ -76,9 +77,14 @@
 ;; CONVERTER
 (defun convert (name template-sexp)
   (set-current-name name)
-  (let ((*package* (find-package :usuage.converter)))
-    (htmlisp template-sexp))
+  (format nil "~A~A"
+          "<!doctype html>"
+          (htmlisp template-sexp)))
 
+(defun read-template-form-file (template-path)
+  (with-open-file (in template-path)
+    (let ((*package* (find-package :usuage.converter)))
+      (read in))))
 
 ;; HTMLISP
 (defvar *htmlisp-functions* (make-hash-table))
@@ -139,8 +145,8 @@
 
 (def-hl-fun get-value-as-list (name prop) 
   (if (String= name "this")
-      (setf name *current-file-name*))
-  (concatenate 'list (get-prop-as-seq name prop)))
+      (setf name *current-name*))
+  (concatenate 'list (get-value-as-seq name prop)))
 
 (def-hl-fun each (func lst)
   (format nil "~{~A~}" (mapcar func lst)))
