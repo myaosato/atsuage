@@ -19,7 +19,6 @@
   *current-name*)
 
 ;; ****
-
 (defvar *no-end-tags* (make-hash-table))
 (defvar *no-end-tag-list* 
    '(:br :img :hr :meta :input :embed :area :base :col :keygen :link :param :source))
@@ -29,29 +28,13 @@
   (gethash key *no-end-tags*))
 
 ;; ****
-
 (defun nil-to-blank (obj)
   (if (null obj)
       ""
       obj))
 
-;; ****
-(defvar *htmlisp-functions* (make-hash-table))
-
-(defmacro def-hl-fun (name args &body body) 
-  `(setf (gethash ',name *htmlisp-functions*) (lambda ,args ,@body)))
-
-(defun hl-fun-p (name)
-  (gethash name *htmlisp-functions*))
-
-(defun call-hl-fun (name args)
-  (apply (gethash name *htmlisp-functions*) args))
-
-;; ****
-(defun convert-list-to-attribute-format (&rest attr-list)
-  (%convert-list-to-attribute-format attr-list))
-  
-(defun %convert-list-to-attribute-format (attr-list &optional (str ""))
+;; HTML-ATTR-STRING  
+(defun convert-list-to-attribute-format (attr-list &optional (str ""))
   (cond ((null attr-list) str)
         ((symbolp (car attr-list))
          (cond ((stringp (cadr attr-list))
@@ -71,8 +54,7 @@
                          (string-downcase (string (car attr-list))))))))
         (t str)))
 
-;; **** 
-
+;; HTML-TAG-STRING
 (defun make-no-end-tag-element-string (tag attr-list)
   (let ((tag-name (string-downcase (string tag))))
     (format nil "<~A~A />" tag-name (convert-list-to-attribute-format attr-list))))
@@ -90,12 +72,27 @@
       (make-no-end-tag-element-string tag attr-list)
       (make-element-string tag attr-list inner-html)))
 
-;; **** 
 
+;; CONVERTER
 (defun convert (name template-sexp)
   (set-current-name name)
-  (htmlisp template-sexp))
+  (let ((*package* (find-package :usuage.converter)))
+    (htmlisp template-sexp))
 
+
+;; HTMLISP
+(defvar *htmlisp-functions* (make-hash-table))
+
+(defmacro def-hl-fun (name args &body body) 
+  `(setf (gethash ',name *htmlisp-functions*) (lambda ,args ,@body)))
+
+(defun hl-fun-p (name)
+  (gethash name *htmlisp-functions*))
+
+(defun call-hl-fun (name args)
+  (apply (gethash name *htmlisp-functions*) args))
+
+;; HTMLISP-CORE
 (defun htmlisp (s-exp &optional (mode 'html))
   (cond ((symbolp s-exp)
          s-exp)
@@ -126,9 +123,9 @@
 (defun concat-htmls (html-list)
   (if (null html-list)
       nil
-      (concatenate 'string (mapcar #'htmlisp html-list))))
+      (format nil "~{~A~}" (mapcar #'htmlisp html-list))))
 
-;; ****
+;; HTMLISP-FUNCTION
 (def-hl-fun get-value (prop name)
   (if (null name)
       (setf name (get-current-name)))
