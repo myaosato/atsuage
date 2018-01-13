@@ -2,7 +2,7 @@
   This file is a part of usuage project.
 |#
 
-(defsystem "usuage"
+(defsystem "atsuage"
   :version "0.1.0"
   :author "Satoaki Miyao"
   :license "MIT"
@@ -14,8 +14,7 @@
                  (:file "converter" :depends-on ("data"))
                  (:file "data" :depends-on ("files" "text"))
                  (:file "core" :depends-on ("files" "data" "converter")))))
-  :description "Usuage is simple static site generator"
+  :description "Atsuage is simple static site generator"
   :long-description
   #.(read-file-string
-     (subpathname *load-pathname* "README.markdown"))
-  :in-order-to ((test-op (test-op "usuage-test"))))
+     (subpathname *load-pathname* "README.markdown")))
