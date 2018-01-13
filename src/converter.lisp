@@ -1,14 +1,14 @@
 (in-package :cl-user)
-(defpackage usuage.converter
+(defpackage atsuage.converter
   (:use :cl)
   (:import-from :cl-markdown
                 :markdown)
-  (:import-from :usuage.data
+  (:import-from :atsuage.data
                 :get-value
                 :get-value-as-seq)
   (:export :convert
            :read-template-form-file))
-(in-package :usuage.converter)
+(in-package :atsuage.converter)
 
 ;;; CURRENT
 (defvar *current-name*)

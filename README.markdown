@@ -1,6 +1,4 @@
-# Usuage
-
-Usuage is simple? static site generator?.
+# Atsuage
 
 Work In Progress
 

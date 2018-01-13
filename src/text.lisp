@@ -1,12 +1,12 @@
 (in-package :cl-user)
-(defpackage usuage.text
+(defpackage atsuage.text
   (:use :cl)
   (:import-from :rosa
                 :peruse-as-plist
                 :indite)
   (:export :get-data-from-text
            :set-data-to-text))
-(in-package :usuage.text)
+(in-package :atsuage.text)
 
 (defun get-data-from-text (pathname &optional (upcase t))
   (with-open-file (in pathname)

@@ -1,5 +1,5 @@
 (in-package :cl-user)
-(defpackage usuage.files
+(defpackage atsuage.files
   (:use :cl)
   (:import-from :cl-fad
                 :pathname-as-directory
@@ -13,7 +13,7 @@
            :get-template-path
            :get-text-list
            :get-template-list))
-(in-package :usuage.files)
+(in-package :atsuage.files)
 
 (defvar *project-dir*)
 (defvar *text-dir*)

@@ -1,23 +1,23 @@
-(defpackage usuage.core
+(defpackage atsuage.core
   (:use :cl)
   (:import-from :cl-fad
                 :pathname-as-directory)
   (:import-from :rosa
                 :indite)
-  (:import-from :usuage.files
+  (:import-from :atsuage.files
                 :set-project-dirs
                 :get-text-list
                 :get-template-list
                 :get-text-path
                 :get-page-path
                 :get-template-path)
-  (:import-from :usuage.data
+  (:import-from :atsuage.data
                 :get-value-as-seq
                 :set-value
                 :add-value
                 :make-data
                 :save-data)
-  (:import-from :usuage.converter
+  (:import-from :atsuage.converter
                 :convert
                 :read-template-form-file)
   (:export :initialize
@@ -25,7 +25,7 @@
            :make-text
            :make-page))
 
-(in-package :usuage.core)
+(in-package :atsuage.core)
 
 ;;; UTIL
 (defun pwd ()

@@ -1,11 +1,11 @@
 (in-package :cl-user)
-(defpackage usuage.data
+(defpackage atsuage.data
   (:use :cl)
   (:import-from :cl-ppcre
                 :scan)
-  (:import-from :usuage.files
+  (:import-from :atsuage.files
                 :get-text-path)
-  (:import-from :usuage.text
+  (:import-from :atsuage.text
                 :get-data-from-text
                 :set-data-to-text)
   (:export :get-value
@@ -14,7 +14,7 @@
            :add-value
            :make-data
            :save-data))
-(in-package :usuage.data)
+(in-package :atsuage.data)
 
 (defun get-key (name)
   (read-from-string (format nil ":~A" (string-upcase name))))
