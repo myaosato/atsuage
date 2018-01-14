@@ -83,7 +83,7 @@
 
 (defun read-template-form-file (template-path)
   (with-open-file (in template-path)
-    (let ((*package* (find-package :usuage.converter)))
+    (let ((*package* (find-package :atsuage.converter)))
       (read in))))
 
 ;; HTMLISP
@@ -122,7 +122,7 @@
                       (t "")))
                (t
                 (cond ((hl-fun-p (car s-exp))
-                       (call-hl-fun (car s-exp) (mapcar 'htmlisp (cadr s-exp))))
+                       (call-hl-fun (car s-exp) (mapcar 'htmlisp (cdr s-exp))))
                       (t "")))))
         (t "")))
 
@@ -132,21 +132,23 @@
       (format nil "~{~A~}" (mapcar #'htmlisp html-list))))
 
 ;; HTMLISP-FUNCTION
-(def-hl-fun get-value (prop name)
+(def-hl-fun get-value (prop &optional name)
   (if (null name)
       (setf name (get-current-name)))
-      (get-value name prop))
+      (get-value prop name))
 
-(def-hl-fun get-value-as-md (prop name) 
+(def-hl-fun get-value-as-md (prop  &optional name) 
   (if (null name)
       (setf name (get-current-name)))
-  (markdown (get-value name prop)))
+  (second (multiple-value-list (markdown (get-value prop name) :stream nil))))
 
-
-(def-hl-fun get-value-as-list (name prop) 
-  (if (String= name "this")
+(def-hl-fun get-value-as-list (prop  &optional name) 
+  (if (string= name "this")
       (setf name *current-name*))
-  (concatenate 'list (get-value-as-seq name prop)))
+  (concatenate 'list (get-value-as-seq prop name)))
+
+(def-hl-fun concat (str1 str2) 
+  (concatenate 'string str1 str2))
 
 (def-hl-fun each (func lst)
   (format nil "~{~A~}" (mapcar func lst)))

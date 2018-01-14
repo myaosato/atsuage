@@ -40,11 +40,11 @@
   (push-data name nil))
 
 ;;; GET VALUE
-(defun get-value-as-seq (prop &optional (name *current-name*))
+(defun get-value-as-seq (prop name)
   (load-data name)
   (getf (get-data name) (get-key prop)))
 
-(defun get-value (prop &optional (name *current-name*) (ind 0))
+(defun get-value (prop name &optional (ind 0))
   (let ((seq (get-value-as-seq prop name)))
     (if (and seq (> (length seq) ind))
         (elt seq ind))))
