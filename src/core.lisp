@@ -67,7 +67,7 @@
 (defun parent-dir (dir)
   (truename (merge-pathnames "../" (pathname-as-directory dir))))
 
-(defun find-file-up (filename &optional (dir pwd))
+(defun find-file-up (filename &optional (dir (pwd)))
   (cond ((probe-file (merge-pathnames filename (pathname-as-directory dir)))
          dir)
         ((= (length (pathname-directory (truename dir))) 1)
@@ -76,7 +76,7 @@
          (find-file-up filename (parent-dir dir)))))
 
 (defun find-atsuage-dir ()
-  (find-file-up "atsuage"))
+  (find-file-up ".atsuage"))
 
 ;;; INIT
 (defun initialize (dir)
