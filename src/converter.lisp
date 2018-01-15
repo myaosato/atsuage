@@ -82,9 +82,10 @@
           (htmlisp template-sexp)))
 
 (defun read-template-form-file (template-path)
-  (with-open-file (in template-path)
-    (let ((*package* (find-package :atsuage.converter)))
-      (read in))))
+  (let ((*read-eval* nil))
+    (with-open-file (in template-path)
+      (let ((*package* (find-package :atsuage.converter)))
+        (read in)))))
 
 ;; HTMLISP
 (defvar *htmlisp-functions* (make-hash-table))

@@ -43,8 +43,9 @@ myaosato、つまり私は、仕様を変更する際には、ここに明記す
 * get-text-path (name)
 * get-page-path (name)
 * get-template-path (name)
-* get-text-list
-* get-template-list
+* get-atsuage-path ()
+* get-text-list ()
+* get-template-list ()
 
 ### TEXT - text.lisp - 
 
