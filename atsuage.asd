@@ -1,5 +1,5 @@
 #|
-  This file is a part of usuage project.
+  This file is a part of atsuage project.
 |#
 
 (defsystem "atsuage"
@@ -13,7 +13,8 @@
                  (:file "files")
                  (:file "converter" :depends-on ("data"))
                  (:file "data" :depends-on ("files" "text"))
-                 (:file "core" :depends-on ("files" "data" "converter")))))
+                 (:file "core" :depends-on ("files" "data" "converter"))
+                 (:file "atsuage" :depends-on ("core")))))
   :description "Atsuage is simple static site generator"
   :long-description
   #.(read-file-string
