@@ -19,20 +19,52 @@
         (initialize dir))
     dir))
 
-(defun %make-page-with-template (name template)
-  (make-page name template))
-
 (defun %make-page (name)
   (make-page name))
 
-(defun command (&rest args)
+(defun ignore-p (name)
+  (find name (getf (get-config) :ignore) :test #'equal))
+
+(defun make-all ()
+  (let ((lst (remove-if #'ignore-p (get-text-list))))
+    (loop for name in lst
+          do (%make-page name))))
+
+(defvar *help*
+  (format nil "
+
+atsuage 
+
+  simple static site generator (WIP)
+
+  page [name] : make page
+  page [name] [template] : make page 
+  all : make pages
+  dir : show current project directry
+  texts : show text list
+  conf : show config
+  help : show help message
+"))
+
+(defun command (args)
   (let ((command (car args))
         (dir (find-project)))
     (cond ((null dir)
-           (format t "can't find an atsuage project"))
+           (format t "can't find an atsuage project~%"))
+          ((string= command "help")
+           (format t "~A~%" *help*))
           ((string= command "page")
-           (%make-page (cadr args)))
+           (if (= (length args) 1)
+               (%make-page (cadr args))
+               (make-page (cadr args) (caddr args))))
+          ((string= command "all")
+           (make-all))
           ((string= command "dir")
-           (format t "~A" dir))
-          (t nil))))
+           (format t "~A~%" dir))
+          ((string= command "texts")
+           (format t "~A~%" (get-text-list)))
+          ((string= command "conf")
+           (format t "~S~%" (get-config)))
+          (t 
+           (format t "command not found: atsuage~{ ~A~}~%" args)))))
   
