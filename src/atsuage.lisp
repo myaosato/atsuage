@@ -37,6 +37,7 @@ atsuage
 
   simple static site generator (WIP)
 
+  new-prpject [name] : make new project
   page [name] : make page
   page [name] [template] : make page 
   all : make pages
@@ -49,10 +50,12 @@ atsuage
 (defun command (args)
   (let ((command (car args))
         (dir (find-project)))
-    (cond ((null dir)
-           (format t "can't find an atsuage project~%"))
+    (cond ((string= command "new-project")
+           (make-project (cadr args)))
           ((string= command "help")
            (format t "~A~%" *help*))
+          ((null dir)
+           (format t "can't find an atsuage project~%"))
           ((string= command "page")
            (if (= (length args) 1)
                (%make-page (cadr args))

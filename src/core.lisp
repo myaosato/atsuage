@@ -54,14 +54,29 @@
         t)))
 
 ;;; MAKE-PROJECT
+(defun input-prompt (prompt)
+  (format t "~A: " prompt)
+  (force-output)
+  (read-line))
+
+(defvar *sample-template* "(:html (:head (:title (get-value \"site-name\" \"project\")))
+       (:body (:p (get-value \"message\") \" \"(get-value \"author\" \"project\") \"'s site\")))")
+
 (defun make-project (name &optional (dir (pwd)))
-  (let* ((project-dir (merge-pathnames (pathname-as-directory name) (pathname-as-directory dir))))
+  (let* ((project-dir (merge-pathnames (pathname-as-directory name) (pathname-as-directory dir)))
+         site-name author)
     (set-project-dirs project-dir)
     (mkdir project-dir)
     (make-file (get-atsuage-path) "")
     (mkdir (get-text-path ""))
-    (mkdir (get-page-path ""))
-    (mkdir (get-template-path ""))))
+    (mkdir (directory-namestring (get-page-path "")))
+    (mkdir (get-template-path ""))
+    (setf site-name (input-prompt "site-name"))
+    (setf author (input-prompt "author"))
+    (write-file (get-atsuage-path) "(:ignore (\"project\"))")
+    (make-file (get-text-path "project") (format nil ":site-name ~A~%:author ~A" site-name author))
+    (make-file (get-template-path "template") (format nil "~A" *sample-template*))
+    (make-file (get-text-path "index") (format nil ":message Welcome"))))
 
 ;;; FIND-PROJECT
 (defun parent-dir (dir)
