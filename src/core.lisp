@@ -58,7 +58,7 @@
   (let* ((project-dir (merge-pathnames (pathname-as-directory name) (pathname-as-directory dir))))
     (set-project-dirs project-dir)
     (mkdir project-dir)
-    (make-file (get-atsuage-path))
+    (make-file (get-atsuage-path) "")
     (mkdir (get-text-path ""))
     (mkdir (get-page-path ""))
     (mkdir (get-template-path ""))))
