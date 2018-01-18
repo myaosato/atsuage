@@ -32,6 +32,10 @@
 
 (in-package :atsuage.core)
 
+(defvar *utf-8*
+    #+(or sbcl ccl cmu allegro ecl lispworks) :utf-8
+    #+clisp charset:utf-8)
+
 ;;; UTIL
 (defun pwd ()
   (truename "."))
@@ -43,13 +47,14 @@
   (handler-bind ((error (lambda (c) (declare (ignore c)) (return-from make-file nil))))
     (with-open-file (out path :direction :output
                          :if-exists :error
-                         :if-does-not-exist :create)
+                         :if-does-not-exist :create
+                         :external-format *utf-8*)
       (princ str out)
       t)))
 
 (defun write-file (path str)
     (handler-bind ((error (lambda (c) (declare (ignore c)) (return-from write-file nil))))
-      (with-open-file (out path :direction :output :if-exists :supersede)
+      (with-open-file (out path :direction :output :if-exists :supersede :external-format *utf-8*)
         (princ str out)
         t)))
 
