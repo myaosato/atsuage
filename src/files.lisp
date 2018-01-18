@@ -64,7 +64,7 @@
                 (list (file-namestring pn))
                 (mapcar (lambda (elt)
                           (concatenate 'string (dir-name pn) elt))
-                        (deep-ls pn)))))
+                        (files pn)))))
 
 ;;; FILE-LIST
 (defun get-text-list ()
