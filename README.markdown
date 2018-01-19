@@ -37,17 +37,20 @@ Roswell and Quicklisp resolve other dependencies.
 ```
 $ atsuage help
 
-
 atsuage
 
-  simple static site generator (WIP)
+  version 0.1.0
+
+  simple static site generator
 
   new-prpject [name] : make new project
+  new [name] : make new texts
   page [name] : make page
-  page [name] [template] : make page
+  page [name] [template] : make page using specified template
   all : make pages
   dir : show current project directry
   texts : show text list
   conf : show config
   help : show help message
+
 ```
