@@ -32,25 +32,28 @@
 
 (defvar *help*
   (format nil "
-
 atsuage 
+  
+  version ~A
 
-  simple static site generator (WIP)
+  simple static site generator 
 
   new-prpject [name] : make new project
   page [name] : make page
-  page [name] [template] : make page 
-  all : make pages
+  page [name] [template] : make page using specified template
+  all : make pages 
   dir : show current project directry
   texts : show text list
   conf : show config
   help : show help message
-"))
+" (slot-value (asdf:find-system :atsuage) 'asdf:version)))
 
 (defun command (args)
   (let ((command (car args))
         (dir (find-project)))
-    (cond ((string= command "new-project")
+    (cond ((null command)
+           (format t "~A~%" *help*))
+          ((string= command "new-project")
            (make-project (cadr args)))
           ((string= command "help")
            (format t "~A~%" *help*))
