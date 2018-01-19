@@ -35,10 +35,11 @@
 atsuage 
   
   version ~A
-
+ppp
   simple static site generator 
 
   new-prpject [name] : make new project
+  new [name] : make new texts
   page [name] : make page
   page [name] [template] : make page using specified template
   all : make pages 
@@ -59,8 +60,10 @@ atsuage
            (format t "~A~%" *help*))
           ((null dir)
            (format t "can't find an atsuage project~%"))
+          ((string= command "new")
+           (make-text (cadr args)))
           ((string= command "page")
-           (if (= (length args) 1)
+           (if (= (length args) 2)
                (%make-page (cadr args))
                (make-page (cadr args) (caddr args))))
           ((string= command "all")

@@ -64,24 +64,41 @@
   (force-output)
   (read-line))
 
+(defvar *sample-text* 
+  (list :TITLE "sample page" :DATE "" :UP "" :PREV "" :NEXT "" :TEXT "### Hello!!
+
+* foo
+* bar
+* baz
+"))
+
+(defvar *default-text* 
+  (list :TITLE "title" :DATE "" :UP "" :PREV "" :NEXT "" :TEXT "please write
+...
+...
+"))
+
 (defvar *sample-template* "(:html (:head (:title (get-value \"site-name\" \"project\")))
-       (:body (:p (get-value \"message\") \" \"(get-value \"author\" \"project\") \"'s site\")))")
+       (:body (:h1 (get-value :site-name \"project\"))
+              (:p \"Welcome \" (get-value \"author\" \"project\") \"'s site\")
+              (:h2 (get-value :title))
+              (:main (get-value-as-md \"text\"))))")
 
 (defun make-project (name &optional (dir (pwd)))
   (let* ((project-dir (merge-pathnames (pathname-as-directory name) (pathname-as-directory dir)))
          site-name author)
+    (setf site-name (input-prompt "site-name"))
+    (setf author (input-prompt "author"))
     (set-project-dirs project-dir)
     (mkdir project-dir)
     (make-file (get-atsuage-path) "")
     (mkdir (get-text-path ""))
     (mkdir (directory-namestring (get-page-path "")))
     (mkdir (get-template-path ""))
-    (setf site-name (input-prompt "site-name"))
-    (setf author (input-prompt "author"))
     (write-file (get-atsuage-path) "(:ignore (\"project\"))")
-    (make-file (get-text-path "project") (format nil ":site-name ~A~%:author ~A" site-name author))
+    (make-text "project" (list :site-name site-name :author author))
     (make-file (get-template-path "template") (format nil "~A" *sample-template*))
-    (make-file (get-text-path "index") (format nil ":message Welcome"))))
+    (make-text "index" *sample-text*)))
 
 ;;; FIND-PROJECT
 (defun parent-dir (dir)
@@ -120,7 +137,8 @@
 (defun read-template (template-name)
   (read-template-form-file (get-template-path template-name)))
 
-(defun make-text (name &rest key-strs)
+(defun make-text (name &optional (key-strs *default-text*))
+  (unless key-strs *default-texts*) ;; -> because   
   (make-data name)
   (do* ((remain (reverse key-strs) (cddr remain))
         (obj (car remain) (car remain))
