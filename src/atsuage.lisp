@@ -43,7 +43,7 @@
 atsuage 
   
   version ~A
-ppp
+
   simple static site generator 
 
   new-prpject [name] : make new project
