@@ -8,7 +8,8 @@
                 :make-page
                 :get-text-list
                 :get-template-list
-                :get-config)
+                :get-config
+                :get-key)
   (:export :command))
 
 (in-package :atsuage)
@@ -29,6 +30,13 @@
   (let ((lst (remove-if #'ignore-p (get-text-list))))
     (loop for name in lst
           do (%make-page name))))
+
+(defun get-text-format (name)
+  (if (null name) (return-from get-text-format nil))
+  (getf (getf (get-config) :text-format) (get-key name)))
+
+(defun %make-text (name &optional (text-format "default"))
+  (make-text name (get-text-format text-format)))
 
 (defvar *help*
   (format nil "
@@ -61,7 +69,9 @@ ppp
           ((null dir)
            (format t "can't find an atsuage project~%"))
           ((string= command "new")
-           (make-text (cadr args)))
+           (if (= (length args) 2)
+               (%make-text (cadr args))
+               (%make-text (cadr args) (caddr args))))
           ((string= command "page")
            (if (= (length args) 2)
                (%make-page (cadr args))

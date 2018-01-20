@@ -13,7 +13,8 @@
            :set-value
            :add-value
            :make-data
-           :save-data))
+           :save-data
+           :get-key))
 (in-package :atsuage.data)
 
 (defun get-key (name)

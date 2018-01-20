@@ -17,7 +17,8 @@
                 :set-value
                 :add-value
                 :make-data
-                :save-data)
+                :save-data
+                :get-key)
   (:import-from :atsuage.converter
                 :convert
                 :read-template-form-file)
@@ -28,7 +29,8 @@
            :make-page
            :get-text-list
            :get-template-list
-           :get-config))
+           :get-config
+           :get-key))
 
 (in-package :atsuage.core)
 
@@ -95,7 +97,9 @@
     (mkdir (get-text-path ""))
     (mkdir (directory-namestring (get-page-path "")))
     (mkdir (get-template-path ""))
-    (write-file (get-atsuage-path) "(:ignore (\"project\"))")
+    (write-file (get-atsuage-path) 
+                (write-to-string (list :ignore '("project") 
+                                       :text-format (list :default *default-text*))))
     (make-text "project" (list :site-name site-name :author author))
     (make-file (get-template-path "template") (format nil "~A" *sample-template*))
     (make-text "index" *sample-text*)))
@@ -138,7 +142,7 @@
   (read-template-form-file (get-template-path template-name)))
 
 (defun make-text (name &optional (key-strs *default-text*))
-  (unless key-strs *default-text*) ;;
+  (unless key-strs (setf kesy-strs *default-text*)) ;;
   (make-data name)
   (do* ((remain (reverse key-strs) (cddr remain))
         (obj (car remain) (car remain))
