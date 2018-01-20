@@ -44,8 +44,8 @@ atsuage
   simple static site generator 
 
   new-prpject [name] : make new project
-  new [name] : make new texts
-  new [name] [format] : make new texts using specified format
+  new [name] : make new text
+  new [name] [format] : make new text using specified format
   page [name] : make page
   page [name] [template] : make page using specified template
   all : make pages 
