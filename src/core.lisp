@@ -142,7 +142,7 @@
   (read-template-form-file (get-template-path template-name)))
 
 (defun make-text (name &optional (key-strs *default-text*))
-  (unless key-strs (setf kesy-strs *default-text*)) ;;
+  (unless key-strs (setf key-strs *default-text*)) ;;
   (make-data name)
   (do* ((remain (reverse key-strs) (cddr remain))
         (obj (car remain) (car remain))
