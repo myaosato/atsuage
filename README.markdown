@@ -120,20 +120,40 @@ If you want to specify used template file, please add a argument.
 
 ```
 $ atsuage page index foo
-``` 
+```
 
 and prepare ```template/foo```. About syntax, please check "Syntax of template file".
 
-### Syntax of template file
-
+### Syntax of template files
 ```
 (:html (:head
         (:title "title"))
        (:body
         (:h1 (get-value "site-name" "project"))
         (:h2 (get-value "title"))
-        (:p "hogehoge" (:a &(:href "./fuga.html") "fuga") "piyopiyo")))
+        (:p "hogehoge" (:a &(:href "./fuga.html") "fuga") "piyopiyo")
+        (:main (get-value-as-md "text"))))
 ```
+
+### Syntax of teｘｔ files
+```
+:TITLE sample page
+:DATE 2018-01-21
+:UP foo
+:PREV bar
+:NEXT baz
+:TEXT
+### Hello!!
+
+* foo
+* bar
+* baz
+
+```
+
+Please check [Rosa Syntax](https://github.com/t-sin/rosa#syntax).
+
+In atsuage, labels are case insensitive.
 
 ### help message
 
