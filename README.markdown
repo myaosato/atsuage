@@ -179,6 +179,11 @@ atsuage
 
 ```
 
+## What dose "atsuage" mean?
+
+It is one of tofu foods.
+[Aburaage - Wikipedia](https://en.wikipedia.org/wiki/Aburaage)
+
 ## Licence
 
 This software is released under the MIT License, please check LICENSE.txt.
