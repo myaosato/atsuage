@@ -46,7 +46,7 @@ $ atsuage new-project mywebsite
 The above command  make directory (~/mywebsite/) and its child directries and child files.
 
 ```
-mywebsite
+mywebsite/
 |--.atsuage
 |--texts/
 |  |--project
