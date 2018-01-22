@@ -124,18 +124,79 @@ $ atsuage page index foo
 
 and prepare ```template/foo```. About syntax, please check "Syntax of template file".
 
-### Syntax of template files
+## Syntax of template files
+
+### simple html tag
+
+```
+(:p "hoge" (:span "piyo"))
+
+-> <p>hoge<span>piyo</span></p>
+```
+### attribute tag
+
+```
+(:a &(:href "hoge.html") "hoge")
+
+-> <a href="hoge.html">hoge</a>
+```
+
+### empty-elements
+
+```
+(:br)
+(:img &(:src "foo.png"))
+
+-> <br /><img src="foo.png">
+```
+
+### information in texts file
+
+texts/foo
+```
+:title foo
+:body
+### fuga
+
+* bar
+* baz
+
+```
+
+texts/project
+```
+:site-name hogera
+```
+
+when ```$ atsuage page foo```
+
+
+```
+(:h1 (:get-value "title"))
+(:h2 (:get-value "site-name" "project"))
+(:get-value-as-md "body")
+
+->
+<h1>foo</h1><h2>hogera<h2><h3>fuga</h3><ul><li>bar</li><li>baz</li></ul>
+```
+
+
+
+### Example template
+
 ```
 (:html (:head
         (:title "title"))
        (:body
         (:h1 (get-value "site-name" "project"))
         (:h2 (get-value "title"))
-        (:p "hogehoge" (:a &(:href "./fuga.html") "fuga") "piyopiyo")
+        (:p "hogehoge"
+            (:a &(:href "./fuga.html") (get-value "title" "fuga"))
+            "piyopiyo")
         (:main (get-value-as-md "text"))))
 ```
 
-### Syntax of teｘｔ files
+## Syntax of teｘｔ files
 ```
 :TITLE sample page
 :DATE 2018-01-21
@@ -155,7 +216,7 @@ Please check [Rosa Syntax](https://github.com/t-sin/rosa#syntax).
 
 In atsuage, labels are case insensitive.
 
-### help message
+## help message
 
 ```
 $ atsuage help
