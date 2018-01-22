@@ -20,13 +20,13 @@
   *current-name*)
 
 ;; ****
-(defvar *no-end-tags* (make-hash-table))
-(defvar *no-end-tag-list* 
+(defvar *empty-elements* (make-hash-table))
+(defvar *empty-elements-list* 
    '(:br :img :hr :meta :input :embed :area :base :col :keygen :link :param :source))
-(dolist (tag *no-end-tag-list*)
-  (setf (gethash tag *no-end-tags*) t))
-(defun no-end-tag-p (key)
-  (gethash key *no-end-tags*))
+(dolist (tag *empty-elements-list*)
+  (setf (gethash tag *empty-elements*) t))
+(defun empty-element-p (key)
+  (gethash key *empty-elements*))
 
 ;; ****
 (defun nil-to-blank (obj)
@@ -56,7 +56,7 @@
         (t str)))
 
 ;; HTML-TAG-STRING
-(defun make-no-end-tag-element-string (tag attr-list)
+(defun make-empty-element-string (tag attr-list)
   (let ((tag-name (string-downcase (string tag))))
     (format nil "<~A~A />" tag-name (convert-list-to-attribute-format attr-list))))
 
@@ -69,8 +69,8 @@
             tag-name)))
 
 (defun make-element (tag attr-list inner-html)
-  (if (no-end-tag-p tag)
-      (make-no-end-tag-element-string tag attr-list)
+  (if (empty-element-p tag)
+      (make-empty-element-string tag attr-list)
       (make-element-string tag attr-list inner-html)))
 
 

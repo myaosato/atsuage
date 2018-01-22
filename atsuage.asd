@@ -3,7 +3,7 @@
 |#
 
 (defsystem "atsuage"
-  :version "0.1.0"
+  :version "0.1.1"
   :author "Satoaki Miyao"
   :license "MIT"
   :depends-on (:cl-fad :alexandria :local-time :cl-ppcre :rosa :cl-markdown)
