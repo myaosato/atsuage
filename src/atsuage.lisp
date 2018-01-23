@@ -31,6 +31,7 @@
     (loop for name in lst
           do (%make-page name))))
 
+
 (defun get-text-format (name)
   (if (null name) (return-from get-text-format nil))
   (getf (getf (get-config) :text-format) (get-key name)))
@@ -76,7 +77,7 @@ atsuage
           ((string= command "page")
            (if (= (length args) 2)
                (%make-page (cadr args))
-               (make-page (cadr args) (caddr args))))
+               (make-page (cadr args) :template-name (caddr args))))
           ((string= command "all")
            (make-all))
           ((string= command "dir")

@@ -99,7 +99,8 @@
     (mkdir (get-template-path ""))
     (write-file (get-atsuage-path) 
                 (write-to-string (list :ignore '("project") 
-                                       :text-format (list :default *default-text*))))
+                                       :text-format (list :default *default-text*)
+                                       :default-templates nil)))
     (make-text "project" (list :site-name site-name :author author))
     (make-file (get-template-path "template") (format nil "~A" *sample-template*))
     (make-text "index" *sample-text*)))
@@ -133,6 +134,15 @@
 (defun get-config ()
   *config*)
 
+(defparameter *default-template-name* "template")
+
+(defun find-template (name)
+  (let ((template (find-if #'(lambda (elt) (string= (car elt) name)) 
+                           (getf *config* :default-templates))))
+    (if (stringp (cdr template))
+        (cdr template)
+        *default-template-name*))) ;;
+
 (defun prepare-project (dir)
   (set-project-dirs dir)
   (read-config))
@@ -151,7 +161,9 @@
     (set-value key name obj))
   (save-data name))
 
-(defun make-page (name &optional (template-name "template") (pre nil) (post nil))
+(defun make-page (name &key (template-name nil) (pre nil) (post nil))
+  (unless (stringp template-name)
+    (setf template-name (find-template name))) ;;
   (if (functionp pre)
       (apply pre name template-name))
   (write-file (get-page-path name) (convert name (read-template template-name)))
