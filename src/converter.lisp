@@ -73,7 +73,6 @@
       (make-empty-element-string tag attr-list)
       (make-element-string tag attr-list inner-html)))
 
-
 ;; CONVERTER
 (defun convert (name template-sexp)
   (set-current-name name)
@@ -87,52 +86,78 @@
       (let ((*package* (find-package :atsuage.converter)))
         (read in)))))
 
+(defun read-template-form-string (template-string)
+  (let ((*read-eval* nil))
+    (let ((*package* (find-package :atsuage.converter)))
+      (read-from-string template-string))))
+
 ;; HTMLISP
 (defvar *htmlisp-functions* (make-hash-table))
+
+(defvar *htmlisp-macros* (make-hash-table))
 
 (defmacro def-hl-fun (name args &body body) 
   `(setf (gethash ',name *htmlisp-functions*) (lambda ,args ,@body)))
 
+(defmacro def-hl-macro (name args &body body) 
+  `(setf (gethash ',name *htmlisp-macros*) (lambda ,args ,@body)))
+
 (defun hl-fun-p (name)
   (gethash name *htmlisp-functions*))
 
-(defun call-hl-fun (name args)
-  (apply (gethash name *htmlisp-functions*) args))
+(defun hl-macro-p (name)
+  (gethash name *htmlisp-macros*))
+
+(defun call-hl-fun (name args-list-sexp mode vars)
+  (apply (gethash name *htmlisp-functions*) (mapcar '(lambda (s-exp) (htmlisp s-exp mode vars)) args-list-sexp)))
+
+(defun expand-eval-hl-macro (name args-list-sexp mode vars)
+  (htmlisp (apply (gethash name *htmlisp-macros*) args-list-sexp) mode vars))
+
+(defun find-var (sym vars)
+  (if (null vars) (return-from find-var (list nil nil)))
+  (let ((var (multiple-value-list (gethash sym (car vars)))))
+    (if (second var)
+        var
+        (find-var sym (cdr vars)))))
 
 ;; HTMLISP-CORE
-(defun htmlisp (s-exp &optional (mode 'html))
-  (cond ((symbolp s-exp)
+(defun htmlisp (s-exp &optional (mode 'html) (vars nil))
+  ;(print s-exp) for debug, myabe i will impliment log-mode
+  (cond ((symbolp s-exp) ; symbol -> symbol, if symbol si registered as variables symbol -> value 
+         (let ((var (find-var s-exp vars)))
+           (if (second var)
+               (first var)
+               s-exp)))
+        ((stringp s-exp) ; string -> string
          s-exp)
-        ((stringp s-exp)
-         s-exp)
-        ((listp s-exp)
-         (cond ((keywordp (car s-exp))
-                (cond ((eq mode 'html)
-                       (let ((attr-list nil)
-                             (inner-html nil))
-                         (cond ((eq (cadr s-exp) '&)
-                                (setf attr-list (htmlisp (caddr s-exp) 'attr))
-                                (setf inner-html (concat-htmls (cdddr s-exp))))
-                               (t
-                                (setf inner-html (concat-htmls (cdr s-exp)))))
-                         (make-element (car s-exp)
-                                       attr-list
-                                       inner-html)))
-                      ((eq mode 'attr)
-                       (mapcar 'htmlisp s-exp))
-                      (t "")))
-               (t
-                (cond ((hl-fun-p (car s-exp))
-                       (call-hl-fun (car s-exp) (mapcar 'htmlisp (cdr s-exp))))
-                      (t "")))))
+        ((and (listp s-exp) (keywordp (car s-exp)) (eq mode 'html)) ; html elements
+         (if (eq (cadr s-exp) '&) ; attributes exist
+             (make-element (car s-exp) (htmlisp (caddr s-exp) 'attr vars) (concat-htmls (cdddr s-exp) 
+                                                                                        mode vars))
+             (make-element (car s-exp) nil (concat-htmls (cdr s-exp) mode vars))))
+        ((and (listp s-exp) (keywordp (car s-exp)) (eq mode 'attr)) ; attributes
+         (mapcar '(lambda (s-exp) (htmlisp s-exp mode vars)) s-exp))
+        ((and (listp s-exp) (eq 'set-vars (car s-exp))) ; like let
+         (set-vars (cadr s-exp) (cddr s-exp) mode vars))
+        ((and (listp s-exp) (hl-fun-p (car s-exp))) ; hl-fun
+         (call-hl-fun (car s-exp) (cdr s-exp) mode vars))
+        ((and (listp s-exp) (hl-macro-p (car s-exp))) ; hl-macro
+         (expand-eval-hl-macro (car s-exp) (cdr s-exp) mode vars)) 
         (t "")))
 
-(defun concat-htmls (html-list)
+(defun concat-htmls (html-list mode vars)
   (if (null html-list)
       nil
-      (format nil "~{~A~}" (mapcar #'htmlisp html-list))))
+      (format nil "~{~A~}" (mapcar #'(lambda (s-exp) (htmlisp s-exp mode vars)) html-list))))
 
-;; HTMLISP-FUNCTION
+(defun set-vars (var-list body mode vars)
+  (let ((local-vars (make-hash-table)))
+    (dolist (var-val var-list)
+      (setf (gethash (car var-val) local-vars) (cadr var-val)))
+    (htmlisp (car body) mode (cons local-vars vars))))
+
+;; HTMLISP-FUNCTIONS
 (def-hl-fun get-value (prop &optional name)
   (if (null name)
       (setf name (get-current-name)))
@@ -148,8 +173,8 @@
       (setf name *current-name*))
   (concatenate 'list (get-value-as-seq prop name)))
 
-(def-hl-fun concat (str1 str2) 
-  (concatenate 'string str1 str2))
+(def-hl-fun concat (&rest strs) 
+  (format nil "~{~A~}" strs))
 
 (def-hl-fun each (func lst)
   (format nil "~{~A~}" (mapcar func lst)))
@@ -157,4 +182,11 @@
 (def-hl-fun anchor (href label)
   (htmlisp (list :a (list :href href) label)))
 
-
+;; HTMLISP-MACROS
+#|(def-hl-macro collect (var lst-sexp &rest body)
+  (let ((lst (htmlisp lst-sexp))
+        (result))
+    (do ()
+        ()
+      )))
+|#
