@@ -109,10 +109,11 @@
   (gethash name *htmlisp-macros*))
 
 (defun call-hl-fun (name args-list-sexp mode vars)
-  (apply (gethash name *htmlisp-functions*) (mapcar '(lambda (s-exp) (htmlisp s-exp mode vars)) args-list-sexp)))
+  (apply (gethash name *htmlisp-functions*) (mapcar #'(lambda (s-exp) (htmlisp s-exp mode vars)) args-list-sexp)))
 
 (defun expand-eval-hl-macro (name args-list-sexp mode vars)
-  (htmlisp (apply (gethash name *htmlisp-macros*) args-list-sexp) mode vars))
+  (let ((eval-s-exp (apply (gethash name *htmlisp-macros*) args-list-sexp)))
+    (htmlisp eval-s-exp mode vars)))
 
 (defun find-var (sym vars)
   (if (null vars) (return-from find-var (list nil nil)))
@@ -137,7 +138,7 @@
                                                                                         mode vars))
              (make-element (car s-exp) nil (concat-htmls (cdr s-exp) mode vars))))
         ((and (listp s-exp) (keywordp (car s-exp)) (eq mode 'attr)) ; attributes
-         (mapcar '(lambda (s-exp) (htmlisp s-exp mode vars)) s-exp))
+         (mapcar #'(lambda (s-exp) (htmlisp s-exp mode vars)) s-exp))
         ((and (listp s-exp) (eq 'set-vars (car s-exp))) ; like let
          (set-vars (cadr s-exp) (cddr s-exp) mode vars))
         ((and (listp s-exp) (hl-fun-p (car s-exp))) ; hl-fun
@@ -152,10 +153,13 @@
       (format nil "~{~A~}" (mapcar #'(lambda (s-exp) (htmlisp s-exp mode vars)) html-list))))
 
 (defun set-vars (var-list body mode vars)
-  (let ((local-vars (make-hash-table)))
+  (let ((vars-hash (make-hash-table))
+        (local-vars))
     (dolist (var-val var-list)
-      (setf (gethash (car var-val) local-vars) (cadr var-val)))
-    (htmlisp (car body) mode (cons local-vars vars))))
+      (setf (gethash (car var-val) vars-hash) (cadr var-val)))
+    (setf local-vars (cons vars-hash vars))
+    (format nil "~{~A~}" (mapcar #'(lambda (s-exp) (htmlisp s-exp mode local-vars)) body))))
+
 
 ;; HTMLISP-FUNCTIONS
 (def-hl-fun get-value (prop &optional name)
@@ -169,8 +173,8 @@
   (second (multiple-value-list (markdown (get-value prop name) :stream nil))))
 
 (def-hl-fun get-value-as-list (prop  &optional name) 
-  (if (string= name "this")
-      (setf name *current-name*))
+  (if (null name)
+      (setf name (get-current-name)))
   (concatenate 'list (get-value-as-seq prop name)))
 
 (def-hl-fun concat (&rest strs) 
@@ -183,10 +187,10 @@
   (htmlisp (list :a (list :href href) label)))
 
 ;; HTMLISP-MACROS
-#|(def-hl-macro collect (var lst-sexp &rest body)
+(def-hl-macro collect (var lst-sexp &rest body)
   (let ((lst (htmlisp lst-sexp))
         (result))
-    (do ()
-        ()
-      )))
-|#
+    (dolist (val lst)
+      (push `(set-vars ((,var ,val)) ,@body) result))
+    (cons 'concat (reverse result))))
+
