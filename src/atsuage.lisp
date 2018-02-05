@@ -20,24 +20,12 @@
         (initialize dir))
     dir))
 
-(defun %make-page (name)
-  (make-page name))
-
 (defun ignore-p (name)
   (find name (getf (get-config) :ignore) :test #'equal))
-
-(defun make-all ()
-  (let ((lst (remove-if #'ignore-p (get-text-list))))
-    (loop for name in lst
-          do (%make-page name))))
-
 
 (defun get-text-format (name)
   (if (null name) (return-from get-text-format nil))
   (getf (getf (get-config) :text-format) (get-key name)))
-
-(defun %make-text (name &optional (text-format "default"))
-  (make-text name (get-text-format text-format)))
 
 (defvar *help*
   (format nil "
@@ -47,7 +35,7 @@ atsuage
 
   simple static site generator 
 
-  new-prpject [name] : make new project
+  new-project [name] : make new project
   new [name] : make new text
   new [name] [format] : make new text using specified format
   page [name] : make page
@@ -59,27 +47,44 @@ atsuage
   help : show help message
 " (slot-value (asdf:find-system :atsuage) 'asdf:version)))
 
+(defun help ()
+  (format t "~A~%" *help*))
+
+(defun new-project (name)
+  (make-project name))
+
+(defun page (name &optional template-name)
+  (if template-name
+      (make-page name :template-name template-name)
+      (make-page name)))
+  
+(defun all ()
+  (let ((lst (remove-if #'ignore-p (get-text-list))))
+    (loop for name in lst
+          do (make-page name))))
+
+(defun new (name &optional text-format)
+  (if text-format
+      (make-text name (get-text-format text-format))
+      (make-text name (get-text-format "default"))))
+
 (defun command (args)
   (let ((command (car args))
         (dir (find-project)))
     (cond ((null command)
-           (format t "~A~%" *help*))
+           (help))
           ((string= command "new-project")
-           (make-project (cadr args)))
+           (new-project (cadr args)))
           ((string= command "help")
-           (format t "~A~%" *help*))
+           (help))
           ((null dir)
            (format t "can't find an atsuage project~%"))
           ((string= command "new")
-           (if (= (length args) 2)
-               (%make-text (cadr args))
-               (%make-text (cadr args) (caddr args))))
+           (new (cadr args) (caddr args)))
           ((string= command "page")
-           (if (= (length args) 2)
-               (%make-page (cadr args))
-               (make-page (cadr args) :template-name (caddr args))))
+           (page (cadr args) (caddr args)))
           ((string= command "all")
-           (make-all))
+           (all))
           ((string= command "dir")
            (format t "~A~%" dir))
           ((string= command "texts")
