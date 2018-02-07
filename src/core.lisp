@@ -30,7 +30,8 @@
            :get-text-list
            :get-template-list
            :get-config
-           :get-key))
+           :get-key
+           :pwd))
 
 (in-package :atsuage.core)
 
@@ -117,8 +118,10 @@
         (t 
          (find-file-up filename (parent-dir dir)))))
 
-(defun find-atsuage-dir ()
-  (find-file-up ".atsuage"))
+(defun find-atsuage-dir (&optional dir)
+  (if dir
+      (find-file-up ".atsuage" dir)
+      (find-file-up ".atsuage")))
 
 ;;; INIT
 (defun initialize (dir)

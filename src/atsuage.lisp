@@ -9,13 +9,15 @@
                 :get-text-list
                 :get-template-list
                 :get-config
-                :get-key)
-  (:export :command))
+                :get-key
+                :pwd)
+  (:export :command
+           :repl-command))
 
 (in-package :atsuage)
 
-(defun find-project ()
-  (let ((dir (find-atsuage-dir)))
+(defun find-project (current-dir)
+  (let ((dir (find-atsuage-dir current-dir)))
     (if dir
         (initialize dir))
     dir))
@@ -68,9 +70,9 @@ atsuage
       (make-text name (get-text-format text-format))
       (make-text name (get-text-format "default"))))
 
-(defun command (args)
+(defun command (args &optional current-dir)
   (let ((command (car args))
-        (dir (find-project)))
+        (dir (find-project current-dir)))
     (cond ((null command)
            (help))
           ((string= command "new-project")
@@ -93,4 +95,8 @@ atsuage
            (format t "~S~%" (get-config)))
           (t 
            (format t "command not found: atsuage~{ ~A~}~%" args)))))
-  
+
+(defun repl-command (command dir &rest args)
+  (unless (stringp command)
+    (setf command (string-downcase (string command))))
+  (command (cons command args)) dir)
