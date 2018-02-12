@@ -2,6 +2,9 @@
   (:use :cl)
   (:import-from :cl-fad
                 :pathname-as-directory)
+  (:import-from :alexandria
+                :plist-hash-table
+                :hash-table-plist)
   (:import-from :rosa
                 :indite)
   (:import-from :atsuage.files
@@ -11,7 +14,8 @@
                 :get-text-path
                 :get-page-path
                 :get-template-path
-                :get-atsuage-path)
+                :get-atsuage-path
+                :get-update-time-path)
   (:import-from :atsuage.data
                 :get-value-as-seq
                 :set-value
@@ -25,6 +29,8 @@
   (:export :make-project
            :find-atsuage-dir
            :initialize           
+           :end
+           :convertedp
            :make-text
            :make-page
            :get-text-list
@@ -123,10 +129,30 @@
       (find-file-up ".atsuage" dir)
       (find-file-up ".atsuage")))
 
-;;; INIT
-(defun initialize (dir)
-  (prepare-project dir))
+;;; UPDATE-TIME
+(defvar *update-time* (make-hash-table :test 'equal))
 
+(defun load-update-time ()
+  (if (probe-file (get-update-time-path)) 
+      (with-open-file (in (get-update-time-path))
+        (setf *update-time* (plist-hash-table (read in) :test 'equal)))))
+
+(defun read-time (name)
+  (gethash name *update-time*))
+
+(defun convertedp (name)
+  (let ((recoded-time (read-time name))
+        (file-time (file-write-date (get-text-path name))))
+    (and recoded-time (= recoded-time file-time))))
+
+(defun write-time (name)
+  (setf (gethash name *update-time*) (file-write-date (get-text-path name))))
+
+(defun save-update-time ()
+  (with-open-file (out (get-update-time-path) :direction :output :if-exists :supersede)
+    (print (hash-table-plist *update-time*) out)))
+
+;;; CONFIG FILE
 (defvar *config*)
 
 (defun read-config ()
@@ -137,6 +163,7 @@
 (defun get-config ()
   *config*)
 
+;;; SELECT TEMPLATE
 (defparameter *default-template-name* "template")
 
 (defun find-template (name)
@@ -146,30 +173,39 @@
         (cdr template)
         *default-template-name*))) ;;
 
-(defun prepare-project (dir)
+;;; INITIALIZE
+(defun initialize (dir)
   (set-project-dirs dir)
-  (read-config))
+  (read-config)
+  (load-update-time))
+
+;;; END
+(defun end ()
+  (save-update-time))
 
 ;;; MAKE-FILES
 (defun read-template (template-name)
   (read-template-form-file (get-template-path template-name)))
 
-(defun make-text (name &optional (key-strs *default-text*))
-  (unless key-strs (setf key-strs *default-text*)) ;;
+(defun plist-keys (plist)
+  (do ((result nil)
+       (ind 0 (+ ind 2)))
+      ((>= ind (length plist)) (reverse result))
+    (push (elt plist ind) result)))
+
+(defun make-text (name &optional (data-plist *default-text*))
+  (unless data-plist (setf key-strs *default-text*)) ;;
   (make-data name)
-  (do* ((remain (reverse key-strs) (cddr remain))
-        (obj (car remain) (car remain))
-        (key (cadr remain) (cadr remain)))
-       ((null remain) nil)
-    (set-value key name obj))
+  (dolist (key (plist-keys data-plist))
+    (set-value key name (getf data-plist key)))
   (save-data name))
 
-(defun make-page (name &key (template-name nil) (pre nil) (post nil))
-  (unless (stringp template-name)
-    (setf template-name (find-template name))) ;;
-  (if (functionp pre)
-      (apply pre name template-name))
+(defun make-page (name &key (template-name nil))
+  (unless (and (stringp template-name) 
+               (probe-file (get-template-path template-name)))
+    ;; if template-file specified by template-name dosen't exist, use default template file for name
+    (setf template-name (find-template name))) 
   (write-file (get-page-path name) (convert name (read-template template-name)))
-  (if (functionp post)
-      (apply post name template-name)))
+  (write-time name))
+
 

@@ -12,12 +12,14 @@
            :get-page-path
            :get-template-path
            :get-atsuage-path
+           :get-update-time-path
            :get-text-list
            :get-template-list))
 (in-package :atsuage.files)
 
 (defvar *project-dir*)
 (defvar *atsuage-file*)
+(defvar *update-time-file*)
 (defvar *texts-dir*)
 (defvar *pages-dir*)
 (defvar *templates-dir*)
@@ -27,6 +29,7 @@
 (defun set-project-dirs (dir)
   (setf *project-dir* (pathname-as-directory dir))
   (setf *atsuage-file* (merge-pathnames ".atsuage" *project-dir*))
+  (setf *update-time-file* (merge-pathnames ".update-time" *project-dir*))
   (setf *texts-dir* (merge-pathnames "texts/" *project-dir*))
   (setf *pages-dir* (merge-pathnames "pages/" *project-dir*))
   (setf *templates-dir* (merge-pathnames "templates/" *project-dir*)))
@@ -43,6 +46,9 @@
 
 (defun get-atsuage-path ()
   *atsuage-file*)
+
+(defun get-update-time-path ()
+  *update-time-file*)
 
 ;;; FILE-LIST-UTIL  
 (defun dir-p (pathname)

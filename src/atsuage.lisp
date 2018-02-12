@@ -4,6 +4,8 @@
                 :make-project
                 :find-atsuage-dir
                 :initialize           
+                :end
+                :convertedp
                 :make-text
                 :make-page
                 :get-text-list
@@ -42,10 +44,12 @@ atsuage
   new [name] [format] : make new text using specified format
   page [name] : make page
   page [name] [template] : make page using specified template
-  all : make pages 
+  all : make pages (updated texts only)
+  all! : make pages (all texts)
   dir : show current project directry
   texts : show text list
   conf : show config
+  updated : show updated text files
   help : show help message
 " (slot-value (asdf:find-system :atsuage) 'asdf:version)))
 
@@ -61,9 +65,17 @@ atsuage
       (make-page name)))
   
 (defun all ()
+  (let ((lst (remove-if (lambda (name) (or (ignore-p name) (convertedp name))) (get-text-list))))
+    (loop for name in lst
+          do (make-page name))))
+
+(defun all! ()
   (let ((lst (remove-if #'ignore-p (get-text-list))))
     (loop for name in lst
           do (make-page name))))
+
+(defun updated ()
+  (format t "~{~A~%~}" (remove-if (lambda (name) (or (ignore-p name) (convertedp name))) (get-text-list))))
 
 (defun new (name &optional text-format)
   (if text-format
@@ -87,14 +99,19 @@ atsuage
            (page (cadr args) (caddr args)))
           ((string= command "all")
            (all))
+          ((string= command "all!")
+           (all!))
           ((string= command "dir")
            (format t "~A~%" dir))
           ((string= command "texts")
            (format t "~A~%" (get-text-list)))
           ((string= command "conf")
            (format t "~S~%" (get-config)))
+          ((string= command "updated")
+           (updated))
           (t 
-           (format t "command not found: atsuage~{ ~A~}~%" args)))))
+           (format t "command not found: atsuage~{ ~A~}~%" args)))
+    (end)))
 
 (defun repl-command (command dir &rest args)
   (unless (stringp command)
