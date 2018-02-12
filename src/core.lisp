@@ -194,7 +194,7 @@
     (push (elt plist ind) result)))
 
 (defun make-text (name &optional (data-plist *default-text*))
-  (unless data-plist (setf key-strs *default-text*)) ;;
+  (unless data-plist (setf data-plist *default-text*)) ;;
   (make-data name)
   (dolist (key (plist-keys data-plist))
     (set-value key name (getf data-plist key)))
