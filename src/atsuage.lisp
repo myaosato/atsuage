@@ -122,8 +122,8 @@ atsuage
                  ((string= command "updated")
                   (updated))
                  (t 
-                  (format t "command not found: atsuage~{ ~A~}~%" args))))
-          (end))))
+                  (format t "command not found: atsuage~{ ~A~}~%" args)))
+           (end)))))
 
 (defun repl-command (command dir &rest args)
   (unless (stringp command)
