@@ -7,6 +7,7 @@
                 :end
                 :convertedp
                 :make-text
+                :make-text-interactive
                 :make-page
                 :get-text-list
                 :get-template-list
@@ -42,6 +43,8 @@ atsuage
   new-project [name] : make new project
   new [name] : make new text
   new [name] [format] : make new text using specified format
+  inew [name] : make new text (interactive)
+  inew [name] [format] : make new text using specified format (interactive)
   page [name] : make page
   page [name] [template] : make page using specified template
   all : make pages (updated texts only)
@@ -82,6 +85,12 @@ atsuage
       (make-text name (get-text-format text-format))
       (make-text name (get-text-format "default"))))
 
+(defun inew (name &optional text-format)
+  (if text-format
+      (make-text-interactive name (get-text-format text-format))
+      (make-text-interactive name (get-text-format "default"))))
+
+
 (defun command (args &optional current-dir)
   (let ((command (car args))
         (dir (find-project current-dir)))
@@ -95,6 +104,8 @@ atsuage
            (format t "can't find an atsuage project~%"))
           ((string= command "new")
            (new (cadr args) (caddr args)))
+          ((string= command "inew")
+           (inew (cadr args) (caddr args)))
           ((string= command "page")
            (page (cadr args) (caddr args)))
           ((string= command "all")

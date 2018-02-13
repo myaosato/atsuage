@@ -32,6 +32,7 @@
            :end
            :convertedp
            :make-text
+           :make-text-interactive
            :make-page
            :get-text-list
            :get-template-list
@@ -190,13 +191,29 @@
 (defun plist-keys (plist)
   (do ((result nil)
        (ind 0 (+ ind 2)))
-      ((>= ind (length plist)) (reverse result))
+      ((>= ind (length plist)) result)
     (push (elt plist ind) result)))
 
 (defun make-text (name &optional (data-plist *default-text*))
   (unless data-plist (setf data-plist *default-text*)) ;;
   (make-data name)
   (dolist (key (plist-keys data-plist))
+    (set-value key name (getf data-plist key)))
+  (save-data name))
+
+(defun make-text-interactive (name &optional (data-plist *default-text*))
+  (unless data-plist (setf data-plist *default-text*)) ;;
+  (make-data name)
+  (dolist (key (reverse (plist-keys data-plist))) ;;
+    (if (find #\Newline (getf data-plist key))
+        (setf (getf data-plist key) (getf data-plist key))
+        (let ((default (getf data-plist key))
+              (input "")) 
+          (format t "~A: (default: ~A) " key default)
+          (force-output)
+          (setf input (read-line))
+          (setf (getf data-plist key) (if (string= input "") default input)))))
+  (dolist (key (plist-keys data-plist)) ;;
     (set-value key name (getf data-plist key)))
   (save-data name))
 
@@ -207,5 +224,3 @@
     (setf template-name (find-template name))) 
   (write-file (get-page-path name) (convert name (read-template template-name)))
   (write-time name))
-
-
