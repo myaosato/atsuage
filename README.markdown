@@ -221,21 +221,25 @@ In atsuage, labels are case insensitive.
 ```
 $ atsuage help
 
-atsuage
+atsuage 
+  
+  version 0.1.1
 
-  version 0.1.0
+  simple static site generator 
 
-  simple static site generator
-
-  new-prpject [name] : make new project
+  new-project [name] : make new project
   new [name] : make new text
   new [name] [format] : make new text using specified format
+  inew [name] : make new text (interactive)
+  inew [name] [format] : make new text using specified format (interactive)
   page [name] : make page
   page [name] [template] : make page using specified template
-  all : make pages
+  all : make pages (updated texts only)
+  all! : make pages (all texts)
   dir : show current project directry
   texts : show text list
   conf : show config
+  updated : show updated text files
   help : show help message
 
 ```
