@@ -32,7 +32,6 @@
            :end
            :convertedp
            :make-text
-           :make-text-interactive
            :make-page
            :get-text-list
            :get-template-list
@@ -194,25 +193,19 @@
       ((>= ind (length plist)) result)
     (push (elt plist ind) result)))
 
-(defun make-text (name &optional (data-plist *default-text*))
+(defun make-text (name interactive-p &optional (data-plist *default-text*))
   (unless data-plist (setf data-plist *default-text*)) ;;
   (make-data name)
-  (dolist (key (plist-keys data-plist))
-    (set-value key name (getf data-plist key)))
-  (save-data name))
-
-(defun make-text-interactive (name &optional (data-plist *default-text*))
-  (unless data-plist (setf data-plist *default-text*)) ;;
-  (make-data name)
-  (dolist (key (reverse (plist-keys data-plist))) ;;
-    (if (find #\Newline (getf data-plist key))
-        (setf (getf data-plist key) (getf data-plist key))
-        (let ((default (getf data-plist key))
-              (input "")) 
-          (format t "~A: (default: ~A) " key default)
-          (force-output)
-          (setf input (read-line))
-          (setf (getf data-plist key) (if (string= input "") default input)))))
+  (if interactive-p
+      (dolist (key (reverse (plist-keys data-plist))) ;;
+        (if (find #\Newline (getf data-plist key))
+            (setf (getf data-plist key) (getf data-plist key))
+            (let ((default (getf data-plist key))
+                  (input "")) 
+              (format t "~A: (default: ~A) " key default)
+              (force-output)
+              (setf input (read-line))
+              (setf (getf data-plist key) (if (string= input "") default input))))))
   (dolist (key (plist-keys data-plist)) ;;
     (set-value key name (getf data-plist key)))
   (save-data name))

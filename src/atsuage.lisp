@@ -7,7 +7,6 @@
                 :end
                 :convertedp
                 :make-text
-                :make-text-interactive
                 :make-page
                 :get-text-list
                 :get-template-list
@@ -82,13 +81,13 @@ atsuage
 
 (defun new (name &optional text-format)
   (if text-format
-      (make-text name (get-text-format text-format))
-      (make-text name (get-text-format "default"))))
+      (make-text name nil (get-text-format text-format))
+      (make-text name nil (get-text-format "default"))))
 
 (defun inew (name &optional text-format)
   (if text-format
-      (make-text-interactive name (get-text-format text-format))
-      (make-text-interactive name (get-text-format "default"))))
+      (make-text name t (get-text-format text-format))
+      (make-text name t (get-text-format "default"))))
 
 
 (defun command (args &optional current-dir)
