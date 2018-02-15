@@ -7,6 +7,10 @@
                 :hash-table-plist)
   (:import-from :rosa
                 :indite)
+  (:import-from :local-time
+                :now
+                :format-timestring
+                :timestamp-to-unix)
   (:import-from :atsuage.files
                 :set-project-dirs
                 :get-text-list
@@ -66,6 +70,7 @@
       (with-open-file (out path :direction :output :if-exists :supersede :external-format *utf-8*)
         (princ str out)
         t)))
+
 
 ;;; MAKE-PROJECT
 (defun input-prompt (prompt)
@@ -183,32 +188,53 @@
 (defun end ()
   (save-update-time))
 
-;;; MAKE-FILES
-(defun read-template (template-name)
-  (read-template-form-file (get-template-path template-name)))
+;;; TIMESTAMP FORMAT
+(defvar +date+ '((:year 4) #\- (:month 2) #\- (:day 2)))
+(defvar +time+ '((:hour 4) #\- (:min 2) #\- (:sec 2)))
+(defun get-date ()
+  (format-timestring nil (now) :format +date+))
+(defun get-time ()
+  (format-timestring nil (now) :format +time+))
+(defun get-unix ()
+  (format nil "~A" (timestamp-to-unix (now))))
 
+;;; MAKE-TEXTS
 (defun plist-keys (plist)
   (do ((result nil)
        (ind 0 (+ ind 2)))
       ((>= ind (length plist)) result)
     (push (elt plist ind) result)))
 
+(defun get-default-value (data-plist key)
+  (let ((val (getf data-plist key)))
+    (cond ((eq val :date) 
+           (get-date))
+          ((eq val :time) 
+           (get-date))
+          ((eq val :unix) 
+           (get-unix))
+          (t val))))
+
 (defun make-text (name interactive-p &optional (data-plist *default-text*))
   (unless data-plist (setf data-plist *default-text*)) ;;
   (make-data name)
   (if interactive-p
       (dolist (key (reverse (plist-keys data-plist))) ;;
-        (if (find #\Newline (getf data-plist key))
-            (setf (getf data-plist key) (getf data-plist key))
-            (let ((default (getf data-plist key))
+        (if (and (stringp (getf data-plist key)) (find #\Newline (getf data-plist key)))
+            (setf (getf data-plist key) (get-default-value data-plist key)) ;; for order ?
+            (let ((default (get-default-value data-plist key))
                   (input "")) 
               (format t "~A: (default: ~A) " key default)
               (force-output)
               (setf input (read-line))
               (setf (getf data-plist key) (if (string= input "") default input))))))
   (dolist (key (plist-keys data-plist)) ;;
-    (set-value key name (getf data-plist key)))
+    (set-value key name (get-default-value data-plist key)))
   (save-data name))
+
+;;; MAKE-PAGES
+(defun read-template (template-name)
+  (read-template-form-file (get-template-path template-name)))
 
 (defun make-page (name &key (template-name nil))
   (unless (and (stringp template-name) 

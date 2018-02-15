@@ -6,7 +6,7 @@
   :version "0.1.1"
   :author "Satoaki Miyao"
   :license "MIT"
-  :depends-on (:cl-fad :alexandria :local-time :cl-ppcre :rosa :cl-markdown)
+  :depends-on (:cl-fad :alexandria :local-time :cl-ppcre :rosa :cl-markdown :local-time)
   :components ((:module "src"
                 :components
                 ((:file "text")
