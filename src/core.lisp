@@ -2,6 +2,8 @@
   (:use :cl)
   (:import-from :cl-fad
                 :pathname-as-directory)
+  (:import-from :cl-ppcre
+                :scan)
   (:import-from :alexandria
                 :plist-hash-table
                 :hash-table-plist)
@@ -198,6 +200,10 @@
 (defun get-unix ()
   (format nil "~A" (timestamp-to-unix (now))))
 
+;;; GET-LAST-NAME
+(defun get-last-name (regex)
+  (car (sort (remove-if #'(lambda (name) (not (scan regex name))) (get-text-list)) #'string>)))
+
 ;;; MAKE-TEXTS
 (defun plist-keys (plist)
   (do ((result nil)
@@ -213,6 +219,10 @@
            (get-date))
           ((eq val :unix) 
            (get-unix))
+          ((eq val :universal) 
+           (get-universal-time))
+          ((and (consp val) (eq (car val) :last))
+           (get-last-name (cadr val)))
           (t val))))
 
 (defun make-text (name interactive-p &optional (data-plist *default-text*))
