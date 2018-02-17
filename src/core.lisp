@@ -201,8 +201,14 @@
   (format nil "~A" (timestamp-to-unix (now))))
 
 ;;; GET-LAST-NAME
-(defun get-last-name (regex)
-  (car (sort (remove-if #'(lambda (name) (not (scan regex name))) (get-text-list)) #'string>)))
+(defvar +date-regex+ "^\\d{4}(?:0[1-9]|1[0-2])(?:0[1-9]|[12][0-9]|3[01])(?:-\\d+)?$")
+
+(defun get-last-name (regex-or-key)
+  (let (regex)
+    (cond ((eq regex-or-key :date) (setf regex +date-regex+))
+          ((stringp regex-or-key) (setf regex regex-or-key))
+          (t (setf regex "")))
+    (car (sort (remove-if #'(lambda (name) (not (scan regex name))) (get-text-list)) #'string>))))
 
 ;;; MAKE-TEXTS
 (defun plist-keys (plist)
