@@ -66,8 +66,7 @@ atsuage
   (if template-name
       (make-page name :template-name template-name)
       (make-page name))
-  ;(auto-update name)
-  )
+  (auto-update name))
   
 (defun all ()
   (let ((lst (remove-if (lambda (name) (or (ignore-p name) (convertedp name))) (get-text-list))))
