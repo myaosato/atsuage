@@ -24,8 +24,10 @@
                 :get-update-time-path)
   (:import-from :atsuage.data
                 :get-value-as-seq
+                :get-value
                 :set-value
                 :add-value
+                :pushnew-value
                 :make-data
                 :save-data
                 :get-key)
@@ -39,6 +41,7 @@
            :convertedp
            :make-text
            :make-page
+           :auto-update
            :get-text-list
            :get-template-list
            :get-config
@@ -81,7 +84,7 @@
   (read-line))
 
 (defvar *sample-text* 
-  (list :TITLE "sample page" :DATE "" :UP "" :PREV "" :NEXT "" :TEXT "### Hello!!
+  (list :TITLE "sample page" :DATE "" :PARENT "" :PREV "" :NEXT "" :TEXT "### Hello!!
 
 * foo
 * bar
@@ -89,7 +92,7 @@
 "))
 
 (defvar *default-text* 
-  (list :TITLE "title" :DATE "" :UP "" :PREV "" :NEXT "" :TEXT "please write
+  (list :TITLE "title" :DATE "" :PARENT "" :PREV "" :NEXT "" :TEXT "please write
 ...
 ...
 "))
@@ -259,3 +262,13 @@
     (setf template-name (find-template name))) 
   (write-file (get-page-path name) (convert name (read-template template-name)))
   (write-time name))
+
+(defun auto-update (name)
+  (let ((parent (get-value "PARENT" name))
+        (prev (get-value "PREV" name)))
+    (when (and parent (not (string= parent "")))
+      (pushnew-value "CHILD" parent name t)
+      (make-page parent))
+    (when (and prev (not (string= prev "")))
+      (set-value "NEXT" prev name t)
+      (make-page prev))))

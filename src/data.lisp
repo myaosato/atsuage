@@ -12,6 +12,7 @@
            :get-value-as-seq
            :set-value
            :add-value
+           :pushnew-value
            :make-data
            :save-data
            :get-key))
@@ -58,7 +59,7 @@
                    (coerce obj 'vector)
                    (coerce (list (string obj)) 'vector))))
         (let ((value (make-value obj)))
-          (setf (getf (gethash name *data-table*) prop) value)
+          (setf (getf (gethash name *data-table*) (get-key prop)) value)
           (if save? (save-data name))))))
   
 (defun add-value (prop name str &optional (save? nil))
@@ -68,6 +69,13 @@
         (set-value prop name (append (coerce seq 'list) (list value)) save?)
         (set-value prop name value save?))))
 
+(defun pushnew-value (prop name str &optional (save? nil))
+  (let ((value (string str))
+        (seq (get-value-as-seq prop name)))
+    (if seq
+        (if (not (find value (coerce seq 'list) :test #'equal))
+            (set-value prop name (cons value (coerce seq 'list)) save?))
+        (set-value prop name value save?))))
   
 (defun save-data (name)
   (if (data-exists name)
