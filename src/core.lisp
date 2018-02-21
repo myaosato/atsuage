@@ -213,6 +213,17 @@
           (t (setf regex "")))
     (car (sort (remove-if #'(lambda (name) (not (scan regex name))) (get-text-list)) #'string>))))
 
+;;; GET-NAME
+(defvar +date-as-name+ '((:year 4) (:month 2) (:day 2)))
+(defun get-date-as-name ()
+  (let ((tmp (format-timestring nil (now) :format +date-as-name+))
+        (last-name (get-last-name +date-regex+)))
+    (if (string= (subseq last-name 0 8) tmp)
+        (if (> (length last-name) 8)
+            (format nil "~A-~A" tmp (1+ (parse-integer (subseq last-name 9))))
+            (format nil "~A-~A" tmp 1))
+        tmp)))
+
 ;;; MAKE-TEXTS
 (defun plist-keys (plist)
   (do ((result nil)
@@ -236,6 +247,9 @@
 
 (defun make-text (name interactive-p &optional (data-plist *default-text*))
   (unless data-plist (setf data-plist *default-text*)) ;;
+  ;; special name
+  (cond ((string= "\\date" name)
+         (setf name (get-date-as-name))))
   (make-data name)
   (if interactive-p
       (dolist (key (reverse (plist-keys data-plist))) ;;
