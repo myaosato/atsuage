@@ -45,10 +45,11 @@ atsuage
   new [name] [format] : make new text using specified format
   inew [name] : make new text (interactive)
   inew [name] [format] : make new text using specified format (interactive)
-  page [name] : make page
-  page [name] [template] : make page using specified template
-  all : make pages (updated texts only)
-  all! : make pages (all texts)
+  page [name] : make page and resolve relation
+  page [name] [template] : make page using specified template and resolve relation
+  update : make pages and resolve relation (updated texts only)
+  page-all : make pages (all texts) this dosen't resolve relation
+  refresh : make pages (all texts) this resolve relation
   dir : show current project directry
   texts : show text list
   conf : show config
@@ -68,15 +69,23 @@ atsuage
       (make-page name))
   (auto-update name))
   
-(defun all ()
+(defun update ()
   (let ((lst (remove-if (lambda (name) (or (ignore-p name) (convertedp name))) (get-text-list))))
     (loop for name in lst
-          do (make-page name))))
+          do (progn
+               (make-page name)
+               (auto-update name)))))
 
-(defun all! ()
+(defun page-all ()
   (let ((lst (remove-if #'ignore-p (get-text-list))))
     (loop for name in lst
           do (make-page name))))
+
+(defun refresh ()
+  (let ((lst (remove-if #'ignore-p (get-text-list))))
+    (loop for name in lst
+          do (progn (make-page name)
+                    (auto-update name)))))
 
 (defun updated ()
   (format t "~{~A~%~}" (remove-if (lambda (name) (or (ignore-p name) (convertedp name))) (get-text-list))))
@@ -110,10 +119,12 @@ atsuage
                   (inew (cadr args) (caddr args)))
                  ((string= command "page")
                   (page (cadr args) (caddr args)))
-                 ((string= command "all")
-                  (all))
-                 ((string= command "all!")
-                  (all!))
+                 ((string= command "update")
+                  (update))
+                 ((string= command "page-all")
+                  (page-all))
+                 ((string= command "refresh")
+                  (refresh))
                  ((string= command "dir")
                   (format t "~A~%" dir))
                  ((string= command "texts")

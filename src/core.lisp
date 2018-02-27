@@ -270,6 +270,8 @@
   (read-template-form-file (get-template-path template-name)))
 
 (defun make-page (name &key (template-name nil))
+  ;; TODO
+  (unless  (probe-file (get-text-path name)) (return-from make-page nil))
   (unless (and (stringp template-name) 
                (probe-file (get-template-path template-name)))
     ;; if template-file specified by template-name dosen't exist, use default template file for name
@@ -280,9 +282,9 @@
 (defun auto-update (name)
   (let ((parent (get-value "PARENT" name))
         (prev (get-value "PREV" name)))
-    (when (and parent (not (string= parent "")))
+    (when (and parent (not (string= parent "")) (probe-file (get-text-path parent)))
       (pushnew-value "CHILD" parent name t)
       (make-page parent))
-    (when (and prev (not (string= prev "")))
+    (when (and prev (not (string= prev "")) (probe-file (get-text-path prev)))
       (set-value "NEXT" prev name t)
       (make-page prev))))
