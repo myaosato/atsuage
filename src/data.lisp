@@ -53,14 +53,15 @@
 
 ;; SET AND SAVE
 (defun set-value (prop name obj &optional (save? nil))
-  (if (data-exists name)
-      (flet ((make-value (obj)
-               (if (and (typep obj 'sequence) (not (stringp obj)))
-                   (coerce obj 'vector)
-                   (coerce (list (string obj)) 'vector))))
-        (let ((value (make-value obj)))
-          (setf (getf (gethash name *data-table*) (get-key prop)) value)
-          (if save? (save-data name))))))
+  (if (not (data-exists name))
+      (load-data name))
+  (flet ((make-value (obj)
+           (if (and (typep obj 'sequence) (not (stringp obj)))
+               (coerce obj 'vector)
+               (coerce (list (string obj)) 'vector))))
+    (let ((value (make-value obj)))
+      (setf (getf (gethash name *data-table*) (get-key prop)) value)
+      (if save? (save-data name)))))
   
 (defun add-value (prop name str &optional (save? nil))
   (let ((value (string str))
