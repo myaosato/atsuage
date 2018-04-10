@@ -118,9 +118,9 @@
                 (write-to-string (list :ignore '("project") 
                                        :text-format (list :default *default-text*)
                                        :default-templates nil)))
-    (make-text "project" (list :site-name site-name :author author))
+    (make-text "project" nil (list :site-name site-name :author author))
     (make-file (get-template-path "template") (format nil "~A" *sample-template*))
-    (make-text "index" *sample-text*)))
+    (make-text "index" nil *sample-text*)))
 
 ;;; FIND-PROJECT
 (defun parent-dir (dir)
