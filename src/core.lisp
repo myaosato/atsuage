@@ -135,9 +135,7 @@
          (find-file-up filename (parent-dir dir)))))
 
 (defun find-atsuage-dir (&optional dir)
-  (if dir
-      (find-file-up ".atsuage" dir)
-      (find-file-up ".atsuage")))
+  (find-file-up ".atsuage" (if dir dir (pwd))))
 
 ;;; UPDATE-TIME
 (defvar *update-time* (make-hash-table :test 'equal))
