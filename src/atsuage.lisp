@@ -75,7 +75,7 @@ atsuage
   (if auto-update (auto-update name))
   (end))
 
-(defun %update (&key (remove-cond (lambda (elt) nil)) (auto-update nil))
+(defun %update (&key (remove-cond (lambda (elt) (declare (ignore elt)) nil)) (auto-update nil))
   (let ((lst (remove-if remove-cond (get-text-list))))
     (dolist (name lst)
       (page name :auto-update auto-update))
@@ -83,7 +83,7 @@ atsuage
 
 (defun update () (%update :remove-cond (lambda (name) (or (ignore-p name) (convertedp name))) :auto-update t))
 (defun page-all () (%update :remove-cond #'ignore-p :auto-update nil))
-(defun reflesh () (%update :remove-cond #'ignore-p :auto-update t))
+(defun refresh () (%update :remove-cond #'ignore-p :auto-update t))
 
 (defun updated ()
   (format t "~{~A~%~}" (remove-if (lambda (name) (or (ignore-p name) (convertedp name))) (get-text-list))))
