@@ -29,8 +29,7 @@
   (find name (getf (get-config) :ignore) :test #'equal))
 
 (defun get-text-format (name)
-  (if (null name) (return-from get-text-format nil))
-  (getf (getf (get-config) :text-format) (get-key name)))
+  (getf (getf (get-config) :text-format) (get-key (if name name "default"))))
 
 (defvar *help*
   (format nil "
@@ -40,21 +39,23 @@ atsuage
 
   simple static site generator 
 
-  new-project [name] : make new project
-  new [name] : make new text
-  new [name] [format] : make new text using specified format
-  inew [name] : make new text (interactive)
-  inew [name] [format] : make new text using specified format (interactive)
-  page [name] : make page and resolve relation
-  page [name] [template] : make page using specified template and resolve relation
-  update : make pages and resolve relation (updated texts only)
-  page-all : make pages (all texts) this dosen't resolve relation
-  refresh : make pages (all texts) this resolve relation
-  dir : show current project directry
-  texts : show text list
-  conf : show config
-  updated : show updated text files
-  help : show help message
+  commands
+
+    new-project [name] : make new project
+    new [name] : make new text
+    new [name] [format] : make new text using specified format
+    inew [name] : make new text (interactive)
+    inew [name] [format] : make new text using specified format (interactive)
+    page [name] : make page and resolve relation
+    page [name] [template] : make page using specified template and resolve relation
+    update : make pages and resolve relation (updated texts only)
+    page-all : make pages (all texts) this dosen't resolve relation
+    refresh : make pages (all texts) this resolve relation
+    dir : show current project directry
+    texts : show text list
+    conf : show config
+    updated : show updated text files
+    help : show help message
 " (slot-value (asdf:find-system :atsuage) 'asdf:version)))
 
 (defun help ()
@@ -63,43 +64,29 @@ atsuage
 (defun new-project (name)
   (make-project name))
 
-(defun page (name &optional template-name)
-  (if template-name
-      (make-page name :template-name template-name)
-      (make-page name))
-  (auto-update name))
-  
-(defun update ()
-  (let ((lst (remove-if (lambda (name) (or (ignore-p name) (convertedp name))) (get-text-list))))
-    (loop for name in lst
-          do (progn
-               (make-page name)
-               (auto-update name)))))
+(defun new (name &optional text-format)
+  (make-text name nil (get-text-format text-format)))
 
-(defun page-all ()
-  (let ((lst (remove-if #'ignore-p (get-text-list))))
-    (loop for name in lst
-          do (make-page name))))
+(defun inew (name &optional text-format)
+  (make-text name t (get-text-format text-format)))
 
-(defun refresh ()
-  (let ((lst (remove-if #'ignore-p (get-text-list))))
-    (loop for name in lst
-          do (progn (make-page name)
-                    (auto-update name)))))
+(defun page (name &key (template-name nil) (auto-update t))
+  (make-page name template-name)
+  (if auto-update (auto-update name))
+  (end))
+
+(defun %update (&key (remove-cond (lambda (elt) nil)) (auto-update nil))
+  (let ((lst (remove-if remove-cond (get-text-list))))
+    (dolist (name lst)
+      (page name :auto-update auto-update))
+    (end)))
+
+(defun update () (%update :remove-cond (lambda (name) (or (ignore-p name) (convertedp name))) :auto-update t))
+(defun page-all () (%update :remove-cond #'ignore-p :auto-update nil))
+(defun reflesh () (%update :remove-cond #'ignore-p :auto-update t))
 
 (defun updated ()
   (format t "~{~A~%~}" (remove-if (lambda (name) (or (ignore-p name) (convertedp name))) (get-text-list))))
-
-(defun new (name &optional text-format)
-  (if text-format
-      (make-text name nil (get-text-format text-format))
-      (make-text name nil (get-text-format "default"))))
-
-(defun inew (name &optional text-format)
-  (if text-format
-      (make-text name t (get-text-format text-format))
-      (make-text name t (get-text-format "default"))))
-
 
 (defun command (args &optional current-dir)
   (let ((command (car args))
@@ -112,30 +99,28 @@ atsuage
            (help))
           ((null dir)
            (format t "can't find an atsuage project~%"))
+          ((string= command "new")
+           (new (cadr args) (caddr args)))
+          ((string= command "inew")
+           (inew (cadr args) (caddr args)))
+          ((string= command "page")
+           (page (cadr args) :template-name (caddr args)))
+          ((string= command "update")
+           (update))
+          ((string= command "page-all")
+           (page-all))
+          ((string= command "refresh")
+           (refresh))
+          ((string= command "dir")
+           (format t "~A~%" dir))
+          ((string= command "texts")
+           (format t "~A~%" (get-text-list)))
+          ((string= command "conf")
+           (format t "~S~%" (get-config)))
+          ((string= command "updated")
+           (updated))
           (t 
-           (cond ((string= command "new")
-                  (new (cadr args) (caddr args)))
-                 ((string= command "inew")
-                  (inew (cadr args) (caddr args)))
-                 ((string= command "page")
-                  (page (cadr args) (caddr args)))
-                 ((string= command "update")
-                  (update))
-                 ((string= command "page-all")
-                  (page-all))
-                 ((string= command "refresh")
-                  (refresh))
-                 ((string= command "dir")
-                  (format t "~A~%" dir))
-                 ((string= command "texts")
-                  (format t "~A~%" (get-text-list)))
-                 ((string= command "conf")
-                  (format t "~S~%" (get-config)))
-                 ((string= command "updated")
-                  (updated))
-                 (t 
-                  (format t "command not found: atsuage~{ ~A~}~%" args)))
-           (end)))))
+           (format t "command not found: atsuage~{ ~A~}~%" args)))))
 
 (defun repl-command (command dir &rest args)
   (unless (stringp command)

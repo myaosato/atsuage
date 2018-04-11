@@ -267,10 +267,10 @@
 (defun read-template (template-name)
   (read-template-form-file (get-template-path template-name)))
 
-(defun make-page (name &key (template-name nil))
+(defun make-page (name &optional (template-name nil))
   ;; TODO
   (unless  (probe-file (get-text-path name)) (return-from make-page nil))
-  (unless (and (stringp template-name) 
+  (unless (and (stringp template-name)
                (probe-file (get-template-path template-name)))
     ;; if template-file specified by template-name dosen't exist, use default template file for name
     (setf template-name (find-template name))) 
