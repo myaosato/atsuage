@@ -98,9 +98,9 @@
 "))
 
 (defvar *sample-template* "(:html (:head (:title (get-value \"site-name\" \"project\")))
-       (:body (:h1 (get-value :site-name \"project\"))
+       (:body (:h1 (get-value \"site-name\" \"project\"))
               (:p \"Welcome \" (get-value \"author\" \"project\") \"'s site\")
-              (:h2 (get-value :title))
+              (:h2 (get-value \"title\"))
               (:main (get-value-as-md \"text\"))))")
 
 (defun make-project (name &optional (dir (pwd)))

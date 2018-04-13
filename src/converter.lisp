@@ -125,7 +125,7 @@
 ;; HTMLISP-CORE
 (defun htmlisp (s-exp &optional (mode 'html) (vars nil))
   ;(print s-exp) for debug, myabe i will impliment log-mode
-  (cond ((symbolp s-exp) ; symbol -> symbol, if symbol si registered as variables symbol -> value 
+  (cond ((symbolp s-exp) ; symbol -> symbol, if symbol is registered as variables symbol -> value 
          (let ((var (find-var s-exp vars)))
            (if (second var)
                (first var)
