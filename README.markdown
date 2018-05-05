@@ -2,9 +2,11 @@
 
 atsuage is a static site generator.
 
-Work In Progress
+## Manual
 
-## Overview
+Simple manual(Japanese) is [here](https://myaosato.github.io/atsuage.html).
+
+English version is this README file. (WIP)
 
 ## Installation
 
