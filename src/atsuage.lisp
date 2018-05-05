@@ -10,8 +10,7 @@
                 :make-page
                 :auto-update
                 :get-text-list
-                :get-template-list
-                :pwd)
+                :get-template-list)
   (:import-from :atsuage.config
                 :ignore-p
                 :get-text-format

@@ -29,8 +29,13 @@
                 :add-value
                 :pushnew-value
                 :make-data
-                :save-data
-                :get-key)
+                :save-data)
+  (:import-from :atsuage.utils
+                :cwd
+                :mkdir
+                :make-file
+                :write-file
+                :*utf-8*)
   (:import-from :atsuage.converter
                 :convert
                 :read-template-form-file)
@@ -46,37 +51,9 @@
            :make-page
            :auto-update
            :get-text-list
-           :get-template-list
-           :pwd))
+           :get-template-list))
 
 (in-package :atsuage.core)
-
-(defvar *utf-8*
-    #+(or sbcl ccl cmu allegro ecl lispworks) :utf-8
-    #+clisp charset:utf-8)
-
-;;; UTIL
-(defun pwd ()
-  (truename "."))
-
-(defun mkdir (dir)
-  (ensure-directories-exist (pathname-as-directory dir)))
-
-(defun make-file (path str)
-  (handler-bind ((error (lambda (c) (declare (ignore c)) (return-from make-file nil))))
-    (with-open-file (out path :direction :output
-                         :if-exists :error
-                         :if-does-not-exist :create
-                         :external-format *utf-8*)
-      (princ str out)
-      t)))
-
-(defun write-file (path str)
-    (handler-bind ((error (lambda (c) (declare (ignore c)) (return-from write-file nil))))
-      (with-open-file (out path :direction :output :if-exists :supersede :external-format *utf-8*)
-        (princ str out)
-        t)))
-
 
 ;;; MAKE-PROJECT
 (defun input-prompt (prompt)
@@ -104,7 +81,7 @@
               (:h2 (get-value \"title\"))
               (:main (get-value-as-md \"text\"))))")
 
-(defun make-project (name &optional (dir (pwd)))
+(defun make-project (name &optional (dir (cwd)))
   (let* ((project-dir (merge-pathnames (pathname-as-directory name) (pathname-as-directory dir)))
          site-name author)
     (setf site-name (input-prompt "site-name"))
@@ -127,7 +104,7 @@
 (defun parent-dir (dir)
   (truename (merge-pathnames "../" (pathname-as-directory dir))))
 
-(defun find-file-up (filename &optional (dir (pwd)))
+(defun find-file-up (filename &optional (dir (cwd)))
   (cond ((probe-file (merge-pathnames filename (pathname-as-directory dir)))
          dir)
         ((= (length (pathname-directory (truename dir))) 1)
@@ -136,7 +113,7 @@
          (find-file-up filename (parent-dir dir)))))
 
 (defun find-atsuage-dir (&optional dir)
-  (find-file-up ".atsuage" (if dir dir (pwd))))
+  (find-file-up ".atsuage" (if dir dir (cwd))))
 
 ;;; UPDATE-TIME
 (defvar *update-time* (make-hash-table :test 'equal))
@@ -203,6 +180,7 @@
 
 ;;; GET-NAME
 (defvar +date-as-name+ '((:year 4) (:month 2) (:day 2)))
+
 (defun get-date-as-name ()
   (let ((tmp (format-timestring nil (now) :format +date-as-name+))
         (last-name (get-last-name +date-regex+)))

@@ -1,8 +1,43 @@
 (defpackage atsuage.utils
   (:use :cl)
-  (:export :get-key))
+  (:export :get-key
+           :cwd
+           :mkdir
+           :make-file
+           :write-file
+           :*utf-8*))
 
 (in-package :atsuage.utils)
 
+
+;; Variables
+
+(defvar *utf-8*
+    #+(or sbcl ccl cmu allegro ecl lispworks) :utf-8
+    #+clisp charset:utf-8)
+
+;; Functions
+
 (defun get-key (name)
   (read-from-string (format nil ":~A" (string-upcase name))))
+
+(defun cwd ()
+  (truename "."))
+
+(defun mkdir (dir)
+  (ensure-directories-exist (pathname-as-directory dir)))
+
+(defun make-file (path str)
+  (ignore-errors
+    (with-open-file (out path :direction :output :if-exists :error :if-does-not-exist :create 
+                         :external-format *utf-8*)
+      (princ str out)
+      path)))
+
+(defun write-file (path str)
+  (ignore-errors
+   (with-open-file (out path :direction :output :if-exists :supersede 
+                        :external-format *utf-8*)
+     (princ str out)
+     path)))
+
