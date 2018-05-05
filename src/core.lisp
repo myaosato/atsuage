@@ -34,6 +34,9 @@
   (:import-from :atsuage.converter
                 :convert
                 :read-template-form-file)
+  (:import-from :atsuage.config
+                :read-config
+                :get-default-templates)
   (:export :make-project
            :find-atsuage-dir
            :initialize           
@@ -44,8 +47,6 @@
            :auto-update
            :get-text-list
            :get-template-list
-           :get-config
-           :get-key
            :pwd))
 
 (in-package :atsuage.core)
@@ -160,23 +161,12 @@
   (with-open-file (out (get-update-time-path) :direction :output :if-exists :supersede)
     (print (hash-table-plist *update-time*) out)))
 
-;;; CONFIG FILE
-(defvar *config*)
-
-(defun read-config ()
-  (let ((*read-eval* nil))
-    (with-open-file (in (get-atsuage-path))
-      (setf *config* (read in)))))
-
-(defun get-config ()
-  *config*)
-
 ;;; SELECT TEMPLATE
 (defparameter *default-template-name* "template")
 
 (defun find-template (name)
   (let ((template (find-if #'(lambda (elt) (string= (car elt) name)) 
-                           (getf *config* :default-templates))))
+                           (get-default-templates))))
     (if (stringp (cdr template))
         (cdr template)
         *default-template-name*))) ;;

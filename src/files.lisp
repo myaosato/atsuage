@@ -24,7 +24,6 @@
 (defvar *pages-dir*)
 (defvar *templates-dir*)
 
-
 ;;; SETTING
 (defun set-project-dirs (dir)
   (setf *project-dir* (pathname-as-directory dir))

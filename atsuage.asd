@@ -9,11 +9,13 @@
   :depends-on (:cl-fad :alexandria :local-time :cl-ppcre :rosa :cl-markdown :local-time)
   :components ((:module "src"
                 :components
-                ((:file "text")
+                ((:file "utils")
+                 (:file "text")
                  (:file "files")
                  (:file "converter" :depends-on ("data"))
-                 (:file "data" :depends-on ("files" "text"))
-                 (:file "core" :depends-on ("files" "data" "converter"))
+                 (:file "data" :depends-on ("files" "text" "utils"))
+                 (:file "config" :depends-on ("files" "utils"))
+                 (:file "core" :depends-on ("files" "data" "converter" "config"))
                  (:file "atsuage" :depends-on ("core")))))
   :description "Atsuage is simple static site generator"
   :long-description

@@ -11,9 +11,12 @@
                 :auto-update
                 :get-text-list
                 :get-template-list
-                :get-config
-                :get-key
                 :pwd)
+  (:import-from :atsuage.config
+                :ignore-p
+                :get-text-format
+                :read-config
+                :get-config)
   (:export :command
            :repl-command))
 
@@ -24,12 +27,6 @@
     (if dir
         (initialize dir))
     dir))
-
-(defun ignore-p (name)
-  (find name (getf (get-config) :ignore) :test #'equal))
-
-(defun get-text-format (name)
-  (getf (getf (get-config) :text-format) (get-key (if name name "default"))))
 
 (defvar *help*
   (format nil "
