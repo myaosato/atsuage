@@ -35,6 +35,7 @@
                 :mkdir
                 :make-file
                 :write-file
+                :input-prompt
                 :*utf-8*)
   (:import-from :atsuage.converter
                 :convert
@@ -56,10 +57,6 @@
 (in-package :atsuage.core)
 
 ;;; MAKE-PROJECT
-(defun input-prompt (prompt)
-  (format t "~A: " prompt)
-  (force-output)
-  (read-line))
 
 (defvar *sample-text* 
   (list :TITLE "sample page" :DATE "" :PARENT "" :PREV "" :NEXT "" :TEXT "### Hello!!
