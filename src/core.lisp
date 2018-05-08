@@ -13,6 +13,13 @@
                 :now
                 :format-timestring
                 :timestamp-to-unix)
+  (:import-from :atsuage.utils
+                :cwd
+                :mkdir
+                :make-file
+                :write-file
+                :input-prompt
+                :*utf-8*)
   (:import-from :atsuage.files
                 :set-project-dirs
                 :get-text-list
@@ -30,13 +37,6 @@
                 :pushnew-value
                 :make-data
                 :save-data)
-  (:import-from :atsuage.utils
-                :cwd
-                :mkdir
-                :make-file
-                :write-file
-                :input-prompt
-                :*utf-8*)
   (:import-from :atsuage.converter
                 :convert
                 :read-template-form-file)
@@ -81,8 +81,8 @@
 (defun make-project (name &optional (dir (cwd)))
   (let* ((project-dir (merge-pathnames (pathname-as-directory name) (pathname-as-directory dir)))
          site-name author)
-    (setf site-name (input-prompt "site-name"))
-    (setf author (input-prompt "author"))
+    (setf site-name (input-prompt "site-name:"))
+    (setf author (input-prompt "author:"))
     (set-project-dirs project-dir)
     (mkdir project-dir)
     (make-file (get-atsuage-path) "")
@@ -200,9 +200,9 @@
            (get-date))
           ((eq val :time) 
            (get-date))
-          ((eq val :unix) 
+          ((eq val :unix)
            (get-unix))
-          ((eq val :universal) 
+          ((eq val :universal)
            (get-universal-time))
           ((and (consp val) (eq (car val) :last))
            (get-last-name (cadr val)))
@@ -220,9 +220,7 @@
             (setf (getf data-plist key) (get-default-value data-plist key)) ;; for order ?
             (let ((default (get-default-value data-plist key))
                   (input "")) 
-              (format t "~A: (default: ~A) " key default)
-              (force-output)
-              (setf input (read-line))
+              (setf input (input-prompt (format nil "~A (default: ~A)" key default)))
               (setf (getf data-plist key) (if (string= input "") default input))))))
   (dolist (key (plist-keys data-plist)) ;;
     (set-value key name (get-default-value data-plist key)))

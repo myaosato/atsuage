@@ -22,7 +22,7 @@
 ;; Functions
 
 (defun input-prompt (prompt)
-  (format t "~A: " prompt)
+  (format t "~A " prompt)
   (force-output)
   (read-line))
 
