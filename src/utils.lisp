@@ -1,13 +1,16 @@
 (defpackage atsuage.utils
   (:use :cl)
   (:import-from :cl-fad
-                :pathname-as-directory)
+                :list-directory
+                :pathname-as-directory
+                :copy-file)
   (:export :get-key
            :cwd
            :mkdir
            :make-file
            :write-file
            :input-prompt
+           :copy-dir-children
            :*utf-8*))
 
 (in-package :atsuage.utils)
@@ -48,4 +51,16 @@
                         :external-format *utf-8*)
      (princ str out)
      path)))
+
+(defun copy-dir-children (from to)
+  (setf from (pathname-as-directory from))
+  (setf to (pathname-as-directory to))
+  (ensure-directories-exist to)
+  (let ((targets (remove-if (lambda (e) (String= (file-namestring e) ""))
+                            (list-directory from))))
+    (loop for file in targets 
+          do (copy-file file (merge-pathnames (file-namestring file) to) :overwrite t))))
+
+
+
 

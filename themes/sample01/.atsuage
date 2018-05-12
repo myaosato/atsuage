@@ -1,0 +1,13 @@
+(:ignore ("project")
+ :text-format 
+ (:default  
+     (:TITLE "title" :DATE :date :PARENT "" :PREV "" :NEXT "" :TEXT "please write
+...
+...
+")
+   :diary
+   (:TITLE "title" :DATE :date :PARENT "diary" :PREV (:LAST :DATE) :NEXT "" :TEXT "please write
+...
+...
+"))
+ :DEFAULT-TEMPLATES (("diary" . "diary")))

@@ -16,6 +16,9 @@
                 :get-text-format
                 :read-config
                 :get-config)
+  (:import-from :atsuage.theme
+                :copy-theme
+                :make-theme)
   (:export :command
            :repl-command))
 
@@ -47,6 +50,8 @@ atsuage
     update : make pages and resolve relation (updated texts only)
     page-all : make pages (all texts) this dosen't resolve relation
     refresh : make pages (all texts) this resolve relation
+    import-theme [theme-dir-path]: copy theme (css, js, templates, .atsuage files) from specified theme directory
+    export-theme : copy theme  files (pages/css/, pages/js/, templates/, .atsuage) to theme/ directory
     dir : show current project directry
     texts : show text list
     conf : show config
@@ -84,6 +89,13 @@ atsuage
 (defun updated ()
   (format t "~{~A~%~}" (remove-if (lambda (name) (or (ignore-p name) (convertedp name))) (get-text-list))))
 
+(defun import-theme (dir from)
+  (copy-theme dir from))
+
+(defun export-theme (dir)
+  (make-theme dir))
+
+
 (defun command (args &optional current-dir)
   (let ((command (car args))
         (dir (find-project current-dir)))
@@ -115,6 +127,10 @@ atsuage
            (format t "~S~%" (get-config)))
           ((string= command "updated")
            (updated))
+          ((string= command "import-theme")
+           (import-theme dir (cadr args)))
+          ((string= command "export-theme")
+           (export-theme dir))
           (t 
            (format t "command not found: atsuage~{ ~A~}~%" args)))))
 

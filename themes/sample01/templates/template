@@ -1,0 +1,21 @@
+(:html &(:lang "ja")
+ (:head 
+  (:meta &(:charset "UTF-8"))
+  (:meta &(:name "viewport" :content "width = device-width, initial-scale = 1, user-scalable = yes"))
+  (:link &(:rel "stylesheet" :type "text/css" :href "css/style.css"))
+  (:title (get-value "site-name" "project") " - " (get-value "title"))) 
+ (:body 
+  (:header &(:id "main-header") 
+   (:h1 (:a &(:href "./index.html") (get-value "site-name" "project"))))
+  (:main 
+   (:header &(:id "article-header") 
+    (:div &(:id "date") (get-value "date"))
+    (:h2 &(:id "title") (get-value "title")))
+   (:div &(:id "article-main") (get-value-as-md "text"))
+   (:footer &(:id "article-header") 
+    "UP: " (:a &(:href (concat (get-value "parent") ".html")) (get-value "parent"))
+    " PREV: " (:a &(:href (concat (get-value "prev") ".html")) (get-value "prev"))
+    " NEXT: " (:a &(:href (concat (get-value "next") ".html")) (get-value "next"))))
+  (:footer &(:id "main-footer")
+   (:div &(:id "copyright")
+    "&copy;" (get-value "pubyear" "project") " " (get-value "author" "project")))))
