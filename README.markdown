@@ -198,7 +198,7 @@ when ```$ atsuage page foo```
         (:main (get-value-as-md "text"))))
 ```
 
-## Syntax of teｘｔ files
+## Syntax of text files
 ```
 :TITLE sample page
 :DATE 2018-01-21
@@ -223,26 +223,32 @@ In atsuage, labels are case insensitive.
 ```
 $ atsuage help
 
+
 atsuage 
   
-  version 0.1.1
+  version 0.2.0
 
   simple static site generator 
 
-  new-project [name] : make new project
-  new [name] : make new text
-  new [name] [format] : make new text using specified format
-  inew [name] : make new text (interactive)
-  inew [name] [format] : make new text using specified format (interactive)
-  page [name] : make page
-  page [name] [template] : make page using specified template
-  all : make pages (updated texts only)
-  all! : make pages (all texts)
-  dir : show current project directry
-  texts : show text list
-  conf : show config
-  updated : show updated text files
-  help : show help message
+  commands
+
+    new-project [name] : make new project
+    new [name] : make new text
+    new [name] [format] : make new text using specified format
+    inew [name] : make new text (interactive)
+    inew [name] [format] : make new text using specified format (interactive)
+    page [name] : make page and resolve relation
+    page [name] [template] : make page using specified template and resolve relation
+    update : make pages and resolve relation (updated texts only)
+    page-all : make pages (all texts) this dosen't resolve relation
+    refresh : make pages (all texts) this resolve relation
+    import-theme [theme-dir-path]: copy theme (css, js, templates, .atsuage files) from specified theme directory
+    export-theme : copy theme  files (pages/css/, pages/js/, templates/, .atsuage) to theme/ directory
+    dir : show current project directry
+    texts : show text list
+    conf : show config
+    updated : show updated text files
+    help : show help message
 
 ```
 
