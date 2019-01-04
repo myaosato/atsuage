@@ -1,7 +1,8 @@
 (defpackage atsuage.core
   (:use :cl)
   (:import-from :cl-fad
-                :pathname-as-directory)
+                :pathname-as-directory
+                :file-exists-p)
   (:import-from :cl-ppcre
                 :scan)
   (:import-from :alexandria
@@ -209,6 +210,8 @@
           (t val))))
 
 (defun make-text (name interactive-p &optional (data-plist *default-text*))
+  (if (file-exists-p (get-text-path name))
+      (return-from make-text nil))
   (unless data-plist (setf data-plist *default-text*)) ;;
   ;; special name
   (cond ((string= "\\date" name)
