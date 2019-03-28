@@ -38,7 +38,7 @@ Roswell and Quicklisp resolve other dependencies.
 
 ### Simple example
 
-For example, you want to maek new project (directory for atsuage and your website) on your home directory (```/home/username/```).
+For example, you want to make new project (directory for atsuage and your website) on your home directory (```/home/username/```).
 
 ```
 $ cd ~
